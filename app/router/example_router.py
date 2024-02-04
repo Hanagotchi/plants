@@ -57,8 +57,7 @@ async def create_example(req: Request,
                                  },
                              ),
                          ]):
-    return controller.create_example(req, example)
-
+    return controller.create_example(req, item)
 
 
 @example.get(
