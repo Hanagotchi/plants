@@ -57,7 +57,7 @@ class SQLAlchemyClient():
         query = select(PlantType).limit(limit)
         result = self.session.scalars(query)
         return result
-    
+
     def find_plant_type_by_botanical_name(
             self, botanical_name_given: str) -> PlantType:
         query = select(PlantType).where(
