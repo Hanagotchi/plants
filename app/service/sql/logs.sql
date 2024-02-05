@@ -5,8 +5,7 @@ CREATE TABLE IF NOT EXISTS dev.logs (
     title VARCHAR(200) NOT NULL, 
     post_date DATETIME NOT NULL,
     last_update_date DATETIME NOT NULL, 
-    content VARCHAR(1000) NOT NULL,
-    plant_id 
+    content VARCHAR(1000) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS dev.logs_photos (
