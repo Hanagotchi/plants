@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from os import environ
 
 from app.database.models.example import Example
+from app.database.models.base import Base
 from typing import List
 
 load_dotenv()
@@ -32,12 +33,12 @@ class SQLAlchemyClient():
     def rollback(self):
         self.session.rollback()
 
-    def clean_table(self, table: Example): #Union[Example, ...]):
+    def clean_table(self, table: Base):
         query = delete(table)
         self.session.execute(query)
         self.session.commit()
 
-    def add(self, record: Example): #Union[Example, ...]):
+    def add(self, record: Base):
         self.session.add(record)
         self.session.commit()
 
