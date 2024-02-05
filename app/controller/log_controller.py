@@ -1,7 +1,7 @@
 from fastapi import Request
 from app.database.models.Log import Log
 from app.schemas.Log import (
-    LogSchema, LogCreateSchema
+    LogCreateSchema
 )
 from app.utils.sql_exception_handling import withSQLExceptionsHandle
 

@@ -1,6 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 from typing import List
 from datetime import datetime
+
+link = "https://pbs.twimg.com/media/EiSK6SgXsAAIQDC?format=jpg&name=small"
 
 
 class LogPhotoCreateSchema(BaseModel):
@@ -9,7 +11,7 @@ class LogPhotoCreateSchema(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "photo_link": "https://pbs.twimg.com/media/EiSK6SgXsAAIQDC?format=jpg&name=small",
+                "photo_link": link,
             }
         }
 
@@ -22,7 +24,7 @@ class LogPhotoSchema(LogPhotoCreateSchema):
         from_attributes = True
         json_schema_extra = {
             "example": {
-                "photo_link": "https://pbs.twimg.com/media/EiSK6SgXsAAIQDC?format=jpg&name=small",
+                "photo_link": link,
                 "id": 1
             }
         }
@@ -37,14 +39,16 @@ class LogCreateSchema(BaseModel):
         json_schema_extra = {
             "example": {
                 "title": "Mi buena petuña",
-                "content": "Mi buena petuña es hermosa. Crece, crece y crece, y en verano me da mandarinas.",
+                "content": ("Mi buena petuña es hermosa. "
+                            "Crece, crece y crece, "
+                            "y en verano me da mandarinas."),
                 "photos":
                 [
                     {
-                        "photo_link": "https://pbs.twimg.com/media/EiSK6SgXsAAIQDC?format=jpg&name=small",
+                        "photo_link": link,
                     },
                     {
-                        "photo_link": "https://pbs.twimg.com/media/EiSK6SgXsAAIQDC?format=jpg&name=small",
+                        "photo_link": link,
                     },
                 ]
             }

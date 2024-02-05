@@ -66,9 +66,9 @@ async def create_example(req: Request,
     status_code=status.HTTP_200_OK,
     response_model=List[ExampleSchema]
 )
-async def get_example(req: Request,
-                           id_example: str = Query(None),
-                           limit: int = Query(10)):
+async def get_example(
+    req: Request, id_example: str = Query(None), limit: int = Query(10)
+):
     if id_example is None:
         return controller.get_all_example(req, limit)
     return [controller.get_example(req, id_example)]

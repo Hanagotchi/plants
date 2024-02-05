@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.database.models.base import Base
 from app.schemas.example import ExampleSchema
 
+
 class Example(Base):
     __tablename__ = "examples1"
     __table_args__ = {'schema': 'dev'}
