@@ -3,7 +3,6 @@ from app.database.models.Log import Log
 from app.schemas.Log import (
     LogSchema,
 )
-
 from app.utils.sql_exception_handling import withSQLExceptionsHandle
 
 
