@@ -35,7 +35,7 @@ class Log(Base):
 
     def __repr__(self) -> str:
         return (
-            f"Example(id={self.id}, "
+            f"Log(id={self.id}, "
             f"title={self.title}, "
             f"created_at={self.created_at}), "
             f"updated_at={self.updated_at}), "
@@ -67,3 +67,10 @@ class LogPhoto(Base):
     photo_link: Mapped[str] = mapped_column(String(120))
     log_id: Mapped[int] = mapped_column(ForeignKey("dev.logs.id"))
     log: Mapped["Log"] = relationship(back_populates="photos")
+
+    def __repr__(self) -> str:
+        return (
+            f"LogPhoto(id={self.id}, "
+            f"photo_link={self.photo_link}, "
+            f"log_id={self.log_id})"
+        )
