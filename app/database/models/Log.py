@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from sqlalchemy import ForeignKey, Integer, String, DateTime
+from sqlalchemy import ForeignKey, Integer, String, DateTime, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.models.base import Base
 from datetime import datetime
 from typing import List
 
-from app.schemas.Log import LogSchema
+from app.schemas.Log import LogCreateSchema
 
 
 class Log(Base):
@@ -15,8 +15,8 @@ class Log(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String(200))
-    created_at: Mapped[datetime] = mapped_column(DateTime)
-    updated_at: Mapped[datetime] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default="DEFAULT CURRENT_TIMESTAMP")
+    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default="DEFAULT CURRENT_TIMESTAMP")
     content: Mapped[str] = mapped_column(String(1000))
     photos: Mapped[List["LogPhoto"]] = relationship(back_populates="log")
 
@@ -31,7 +31,7 @@ class Log(Base):
         )
 
     @classmethod
-    def from_pydantic(cls, pydantic_obj: LogSchema):
+    def from_pydantic(cls, pydantic_obj: LogCreateSchema):
         photos = list(map(lambda p: LogPhoto(
             photo_link=p.photo_link
         ), pydantic_obj.photos))

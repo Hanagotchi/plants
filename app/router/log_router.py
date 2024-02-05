@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body, Request, status
-from app.schemas.Log import LogSchema
+from app.schemas.Log import LogSchema, LogCreateSchema
 from app.controller import log_controller as controller
 from typing import Annotated
 
@@ -32,5 +32,5 @@ create_log_examples = Body(
     status_code=status.HTTP_201_CREATED,
     response_model=LogSchema
 )
-async def create_log(req: Request, item: Annotated[LogSchema, create_log_examples]):
+async def create_log(req: Request, item: Annotated[LogCreateSchema, create_log_examples]):
     return controller.create_log(req, item)
