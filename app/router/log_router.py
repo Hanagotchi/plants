@@ -17,6 +17,7 @@ create_log_examples = Body(
                 "content": ("Mi buena petuña es hermosa. "
                             "Crece, crece y crece, "
                             "y en verano me da mandarinas."),
+                "plant_id": 4,
                 "photos":
                 [
                     {

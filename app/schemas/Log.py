@@ -34,6 +34,8 @@ class LogCreateSchema(BaseModel):
     title: str = Field(...)
     content: str = Field(...)
     photos: List[LogPhotoCreateSchema] = Field(...)
+    plant_id: int = Field(default=4)
+    # TODO: quitar default cuando ya exista el model de Plant.
 
     class Config:
         json_schema_extra = {
@@ -42,6 +44,7 @@ class LogCreateSchema(BaseModel):
                 "content": ("Mi buena petuña es hermosa. "
                             "Crece, crece y crece, "
                             "y en verano me da mandarinas."),
+                "plant_id": 4,
                 "photos":
                 [
                     {

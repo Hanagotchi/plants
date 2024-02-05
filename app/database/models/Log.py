@@ -26,6 +26,13 @@ class Log(Base):
     content: Mapped[str] = mapped_column(String(1000))
     photos: Mapped[List["LogPhoto"]] = relationship(back_populates="log")
 
+    """El model de Plant debe tener esta linea"""
+    # logs: Mapped[List["Log"]] = relationship(back_populates="plant")
+
+    """Para yo luego poder desbloquear estas lineas"""
+    # plant_id: Mapped[int] = mapped_column(ForeignKey("dev.plants.id"))
+    # plant: Mapped["Plant"] = relationship(back_populates="logs")
+
     def __repr__(self) -> str:
         return (
             f"Example(id={self.id}, "
@@ -34,6 +41,7 @@ class Log(Base):
             f"updated_at={self.updated_at}), "
             f"content={self.content}), "
             f"photos={self.photos}), "
+            # f"plant_id={self.plant_id}"
         )
 
     @classmethod
@@ -44,7 +52,8 @@ class Log(Base):
         return Log(
             title=pydantic_obj.title,
             content=pydantic_obj.content,
-            photos=photos
+            photos=photos,
+            # plant_id=pydantic_obj.plant_id
         )
 
 
