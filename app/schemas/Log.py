@@ -1,24 +1,22 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 
 class LogPhotoSchema(BaseModel):
-    __tablename__ = "logs_photos"
-    __table_args__ = {'schema': 'dev'}
-
+    id: Optional[int] = Field(None)
     photo_link: str = Field(...)
-    log_id: int = Field(...)
 
     class Config:
         json_schema_extra = {
             "example": {
                 "photo_link": "https://pbs.twimg.com/media/EiSK6SgXsAAIQDC?format=jpg&name=small",
-                "log_id": 1
+                "id": 1
             }
         }
 
 
 class LogSchema(BaseModel):
+    id: Optional[int] = Field(None)
     title: str = Field(...)
     content: str = Field(...)
     photos: List[LogPhotoSchema] = Field(...)
@@ -32,11 +30,9 @@ class LogSchema(BaseModel):
                 [
                     {
                         "photo_link": "https://pbs.twimg.com/media/EiSK6SgXsAAIQDC?format=jpg&name=small",
-                        "log_id": 1
                     },
                     {
                         "photo_link": "https://pbs.twimg.com/media/EiSK6SgXsAAIQDC?format=jpg&name=small",
-                        "log_id": 1
                     },
                 ]
             }
