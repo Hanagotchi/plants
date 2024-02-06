@@ -8,8 +8,6 @@ services:
     container_name: plants
     env_file:
       - .env
-    networks:
-      - common_network
     ports:
       - ${PORT}:${PORT}
     depends_on:
