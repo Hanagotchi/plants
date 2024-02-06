@@ -2,7 +2,7 @@ default: docker-compose-up
 
 all:
 
-docker-image: create-network
+docker-image:
 	docker build -f ./Dockerfile -t "app:latest" .
 .PHONY: docker-image
 
