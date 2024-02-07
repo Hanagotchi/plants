@@ -8,8 +8,6 @@ services:
     container_name: plants
     env_file:
       - .env
-    networks:
-      - common_network
     ports:
       - ${PORT}:${PORT}
     depends_on:
@@ -48,9 +46,3 @@ services:
       timeout: 3s
       retries: 10
       start_period: 50s
-    networks:
-      - common_network
-      
-networks:
-  common_network:
-    external: true

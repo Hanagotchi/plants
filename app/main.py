@@ -1,7 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
-from app.router import api_router
+from app.controller import example_controller, plant_types_controller
+from typing import List
+from app.schemas.example import (
+    ExampleSchema,
+)
+from app.schemas.plant_type import PlantTypeSchema
 
 app = FastAPI()
 
@@ -31,4 +36,46 @@ async def shutdown_db_client():
 async def root():
     return {"message": "Hello World"}
 
-app.include_router(api_router)
+
+@app.post(
+    "/example",
+    status_code=status.HTTP_201_CREATED,
+    response_model=ExampleSchema
+)
+async def create_example(req: Request,
+                         item: ExampleSchema):
+    return example_controller.create_example(req, item)
+
+
+@app.get(
+    "/example",
+    status_code=status.HTTP_200_OK,
+    response_model=List[ExampleSchema]
+)
+async def get_example(req: Request,
+                      id_example: str = Query(None),
+                      limit: int = Query(10)):
+    if id_example is None:
+        return example_controller.get_all_example(req, limit)
+    return [example_controller.get_example(req, id_example)]
+
+
+@app.get(
+    "/plant-type",
+    status_code=status.HTTP_200_OK,
+    response_model=List[PlantTypeSchema]
+)
+async def get_all_plant_types(req: Request, limit: int = Query(10)):
+    return plant_types_controller.get_all_plant_types(req, limit)
+
+
+@app.get(
+    "/plant-type/{botanical_name}",
+    status_code=status.HTTP_200_OK,
+    response_model=PlantTypeSchema
+)
+async def get_plant_type(
+    botanical_name: str,
+    req: Request,
+):
+    return plant_types_controller.get_plant_type(req, botanical_name)
