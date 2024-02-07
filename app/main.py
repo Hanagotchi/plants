@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
 from app.controller import example_controller, plant_types_controller
-from typing import List
+from typing import List, Optional
 from app.schemas.example import (
     ExampleSchema,
 )
@@ -65,7 +65,7 @@ async def get_example(req: Request,
     status_code=status.HTTP_200_OK,
     response_model=List[PlantTypeSchema]
 )
-async def get_all_plant_types(req: Request, limit: int = Query(10)):
+async def get_all_plant_types(req: Request, limit: Optional[int] = None):
     return plant_types_controller.get_all_plant_types(req, limit)
 
 
