@@ -44,6 +44,8 @@ class LogCreateSchema(BaseModel):
                 "content": ("Mi buena petuña es hermosa. "
                             "Crece, crece y crece, "
                             "y en verano me da mandarinas."),
+                "created_at": "2024-02-07T21:23:13.548658",
+                "updated_at": "2024-02-07T21:23:13.548658",
                 "plant_id": 4,
                 "photos":
                 [
@@ -66,3 +68,22 @@ class LogSchema(LogCreateSchema):
 
     class Config:
         from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "id": 102,
+                "title": "Mi buena petuña",
+                "content": ("Mi buena petuña es hermosa. "
+                            "Crece, crece y crece, "
+                            "y en verano me da mandarinas."),
+                "plant_id": 4,
+                "photos":
+                [
+                    {
+                        "photo_link": link,
+                    },
+                    {
+                        "photo_link": link,
+                    },
+                ]
+            }
+        }

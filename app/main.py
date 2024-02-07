@@ -1,7 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
-from app.router import api_router
+from app.controller import example_controller, log_controller
+from typing import List
+from app.schemas.example import (
+    ExampleSchema,
+)
+from app.schemas.Log import LogCreateSchema, LogSchema
 
 app = FastAPI()
 
@@ -31,4 +36,36 @@ async def shutdown_db_client():
 async def root():
     return {"message": "Hello World"}
 
-app.include_router(api_router)
+
+@app.post(
+    "/example",
+    status_code=status.HTTP_201_CREATED,
+    response_model=ExampleSchema
+)
+async def create_example(req: Request,
+                         item: ExampleSchema):
+    return example_controller.create_example(req, item)
+
+
+@app.get(
+    "/example",
+    status_code=status.HTTP_200_OK,
+    response_model=List[ExampleSchema]
+)
+async def get_example(req: Request,
+                      id_example: str = Query(None),
+                      limit: int = Query(10)):
+    if id_example is None:
+        return example_controller.get_all_example(req, limit)
+    return [example_controller.get_example(req, id_example)]
+
+
+@app.post(
+    "/logs",
+    status_code=status.HTTP_201_CREATED,
+    response_model=LogSchema
+)
+async def create_log(
+    req: Request, item: LogCreateSchema
+):
+    return log_controller.create_log(req, item)
