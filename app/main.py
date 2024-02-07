@@ -2,11 +2,12 @@ from fastapi import FastAPI, Request, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
 from app.controller import example_controller, log_controller
-from typing import List
+from typing import List, Optional
 from app.schemas.example import (
     ExampleSchema,
 )
 from app.schemas.Log import LogCreateSchema, LogSchema
+
 
 app = FastAPI()
 
@@ -69,3 +70,14 @@ async def create_log(
     req: Request, item: LogCreateSchema
 ):
     return log_controller.create_log(req, item)
+
+
+@app.get(
+    "/logs",
+    status_code=status.HTTP_200_OK,
+    response_model=List[LogSchema]
+)
+async def get_logs(
+    req: Request, year: int, month: Optional[int] = None
+):
+    return log_controller.get_logs(req, year, month)

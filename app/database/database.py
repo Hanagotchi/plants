@@ -4,8 +4,10 @@ from dotenv import load_dotenv
 from os import environ
 
 from app.database.models.example import Example
+from app.database.models.Log import Log
 from app.database.models.base import Base
 from typing import List
+from datetime import date
 
 load_dotenv()
 
@@ -49,5 +51,10 @@ class SQLAlchemyClient():
 
     def find_all(self, limit: int) -> List[Example]:
         query = select(Example).limit(limit)
+        result = self.session.scalars(query)
+        return result
+    
+    def get_logs_between(self, cleft: date, cright: date) -> List[Log]:
+        query = select(Log).where(Log.created_at.between(cleft, cright))
         result = self.session.scalars(query)
         return result
