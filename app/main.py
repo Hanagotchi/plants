@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Request, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
-from app.controller import example_controller
+from app.controller import plant_controller
 from typing import List
-from app.schemas.example import (
-    ExampleSchema,
+from app.schemas.plants import (
+    PlantsSchema,
 )
 
 app = FastAPI()
@@ -37,24 +37,33 @@ async def root():
 
 
 @app.post(
-    "/example",
+    "/plants",
     status_code=status.HTTP_201_CREATED,
-    response_model=ExampleSchema
+    response_model=PlantsSchema
 )
-async def create_example(req: Request,
-                         item: ExampleSchema):
-    return example_controller.create_example(req, item)
+async def create_plant(req: Request,
+                         item: PlantsSchema):
+    return plant_controller.create_plant(req, item)
 
 
 @app.get(
-    "/example",
+    "/plants",
     status_code=status.HTTP_200_OK,
-    response_model=List[ExampleSchema]
+    response_model=List[PlantsSchema]
 )
-async def get_example(req: Request,
-                      id_example: str = Query(None),
-                      limit: int = Query(10)):
-    if id_example is None:
-        return example_controller.get_all_example(req, limit)
-    return [example_controller.get_example(req, id_example)]
+async def get_all_plants(req: Request,
+                      id_user: str = Query(None),
+                      limit: int = Query(1024)):
+    if id_user is not None:
+        return plant_controller.get_all_plants_of_user(req, id_user, limit)
+            
+    return plant_controller.get_all_plants(req, limit)
 
+
+@app.get(
+    "/plants/{id_plant}",
+    status_code=status.HTTP_200_OK,
+    response_model=PlantsSchema
+)
+async def get_one_plant(req: Request, id_plant: str):
+    return plant_controller.get_plant(req, id_plant)
