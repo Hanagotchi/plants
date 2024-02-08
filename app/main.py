@@ -77,10 +77,10 @@ async def create_log(
     status_code=status.HTTP_200_OK,
     response_model=List[LogSchema]
 )
-async def get_logs(
+async def get_logs_by_plant(
     req: Request,
     plant_id: int,
     year: int = Query(..., gt=0),
     month: Optional[int] = Query(None, ge=1, le=12)
 ):
-    return log_controller.get_logs(req, plant_id, year, month)
+    return log_controller.get_logs_by_plant(req, plant_id, year, month)

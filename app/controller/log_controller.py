@@ -20,10 +20,10 @@ def create_log(req: Request, input_log: LogCreateSchema) -> Log:
 
 
 @withSQLExceptionsHandle
-def get_logs(req: Request,
-             plant_id: int,
-             year: int,
-             month: Optional[int]) -> List[Log]:
+def get_logs_by_plant(req: Request,
+                      plant_id: int,
+                      year: int,
+                      month: Optional[int]) -> List[Log]:
     if month:
         left = date(year, month, 1)
         right = left + timedelta(weeks=4)
