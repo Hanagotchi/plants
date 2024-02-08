@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from os import environ
 
 from app.database.models.example import Example
-from app.database.models.Log import Log
+from app.database.models.Log import Log, LogPhoto
 from app.database.models.base import Base
 from typing import List
 from datetime import date
@@ -55,12 +55,13 @@ class SQLAlchemyClient():
         return result
 
     def find_logs_between(self,
-                          plant_id: int,
+                          user_id: int,
                           cleft: date,
                           cright: date) -> List[Log]:
-        # where(Log.plant_id == plant_id).\
+        # where(Log.plant.user_id == user_id).\
         query = select(Log).\
                 where(Log.created_at.between(cleft, cright)).\
+                where(Log.photos.any(LogPhoto.id == 3)).\
                 order_by(Log.created_at.asc())
         result = self.session.scalars(query)
         return result
