@@ -8,6 +8,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE TABLE 
+    IF NOT EXISTS dev.plants (
+        id SERIAL PRIMARY KEY, 
+        user_id SERIAL NOT NULL,
+        name VARCHAR(64) NOT NULL, 
+        scientific_name VARCHAR(64) NOT NULL
+);
+DO $do$ BEGIN
+    IF (SELECT COUNT(*) FROM dev.plants) = 0 THEN
+        INSERT INTO dev.plants (user_id, name, scientific_name) VALUES 
+            (1, 'Rosa', 'Rosa'),
+            (2, 'Margarita', 'Margarita'),
+            (3, 'Girasol', 'Girasol');
+    END IF;
+END $do$;
+
 CREATE TABLE IF NOT EXISTS dev.logs (
     id SERIAL PRIMARY KEY, 
     title VARCHAR(200) NOT NULL, 

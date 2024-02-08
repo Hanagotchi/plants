@@ -6,7 +6,7 @@ from app.database.models.base import Base
 from datetime import datetime
 from typing import List
 
-from app.schemas.Log import LogCreateSchema
+from app.schemas.log import LogCreateSchema
 
 
 class Log(Base):

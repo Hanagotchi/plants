@@ -6,7 +6,7 @@ from typing import List
 from app.schemas.example import (
     ExampleSchema,
 )
-from app.schemas.Log import LogCreateSchema, LogSchema
+from app.schemas.log import LogCreateSchema, LogSchema
 
 app = FastAPI()
 
