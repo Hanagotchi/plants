@@ -7,6 +7,7 @@ from app.utils.sql_exception_handling import withSQLExceptionsHandle
 from typing import Optional, List
 from datetime import date, timedelta
 
+
 @withSQLExceptionsHandle
 def create_log(req: Request, input_log: LogCreateSchema) -> Log:
     try:

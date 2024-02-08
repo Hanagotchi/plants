@@ -78,6 +78,8 @@ async def create_log(
     response_model=List[LogSchema]
 )
 async def get_logs(
-    req: Request, year: int, month: Optional[int] = None
+    req: Request,
+    year: int = Query(..., gt=0),
+    month: Optional[int] = Query(None, ge=1, le=12)
 ):
     return log_controller.get_logs(req, year, month)
