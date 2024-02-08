@@ -1,6 +1,36 @@
 version: '3.9'
 
 services:
+  # simulator:
+  #   build:
+  #     context: ../simulator
+  #   container_name: simulator
+  #   env_file:
+  #     - ../simulator/.env
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #     sql:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ../simulator/src:/app/src
+
+  # measurements:
+  #   build:
+  #     context: ../measurements
+  #   container_name: measurements
+  #   env_file:
+  #     - ../measurements/.env
+  #   depends_on:
+  #     sql:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ../measurements/app:/app
+  #   tty: true
 
   plants:
     build:
@@ -21,6 +51,7 @@ services:
     build:
       context: ./app/service/sql
       dockerfile: Dockerfile
+    container_name: sql
     env_file:
       - .env
     ports:
@@ -38,11 +69,29 @@ services:
           "5432",
           "-q",
           "-U",
-          "${POSTGRES_USER}",
-          "-d",
-          "${POSTGRES_DB}"
+          "${POSTGRES_USER}"
         ]
       interval: 5s
       timeout: 3s
       retries: 10
       start_period: 50s
+
+  # rabbitmq:
+  #   build:
+  #     context: ../measurements/app/service/rabbitmq
+  #     dockerfile: Dockerfile
+  #   container_name: rabbitmq
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD",
+  #         "rabbitmq-diagnostics",
+  #         "check_port_connectivity"
+  #       ]
+  #     interval: 5s
+  #     timeout: 3s
+  #     retries: 10
+  #     start_period: 50s
