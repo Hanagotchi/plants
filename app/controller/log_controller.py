@@ -20,7 +20,10 @@ def create_log(req: Request, input_log: LogCreateSchema) -> Log:
 
 
 @withSQLExceptionsHandle
-def get_logs(req: Request, year: int, month: Optional[int]) -> List[Log]:
+def get_logs(req: Request,
+             plant_id: int,
+             year: int,
+             month: Optional[int]) -> List[Log]:
     if month:
         left = date(year, month, 1)
         right = left + timedelta(weeks=4)
@@ -28,4 +31,4 @@ def get_logs(req: Request, year: int, month: Optional[int]) -> List[Log]:
         left = date(year, 1, 1)
         right = date(year+1, 1, 1)
 
-    return req.app.database.get_logs_between(left, right)
+    return req.app.database.find_logs_between(plant_id, left, right)

@@ -54,7 +54,11 @@ class SQLAlchemyClient():
         result = self.session.scalars(query)
         return result
 
-    def get_logs_between(self, cleft: date, cright: date) -> List[Log]:
+    def find_logs_between(self,
+                          plant_id: int,
+                          cleft: date,
+                          cright: date) -> List[Log]:
+        # where(Log.plant_id == plant_id).\
         query = select(Log).\
                 where(Log.created_at.between(cleft, cright)).\
                 order_by(Log.created_at.asc())

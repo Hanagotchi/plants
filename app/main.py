@@ -73,13 +73,14 @@ async def create_log(
 
 
 @app.get(
-    "/logs",
+    "/logs/{plant_id}",
     status_code=status.HTTP_200_OK,
     response_model=List[LogSchema]
 )
 async def get_logs(
     req: Request,
+    plant_id: int,
     year: int = Query(..., gt=0),
     month: Optional[int] = Query(None, ge=1, le=12)
 ):
-    return log_controller.get_logs(req, year, month)
+    return log_controller.get_logs(req, plant_id, year, month)
