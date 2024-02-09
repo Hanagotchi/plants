@@ -29,7 +29,11 @@ CREATE TABLE IF NOT EXISTS dev.logs (
     title VARCHAR(200) NOT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-    content VARCHAR(1000) NOT NULL
+    content VARCHAR(1000) NOT NULL,
+    plant_id INT,
+    CONSTRAINT fk_plant
+        FOREIGN KEY (plant_id)
+            REFERENCES dev.plants(id)
 );
 
 CREATE TRIGGER set_timestamp

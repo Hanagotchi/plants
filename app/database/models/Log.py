@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.models.base import Base
 from datetime import datetime
 from typing import List
+from app.database.models.plant import Plant
 
 from app.schemas.log import LogCreateSchema
 
@@ -25,13 +26,8 @@ class Log(Base):
     )
     content: Mapped[str] = mapped_column(String(1000))
     photos: Mapped[List["LogPhoto"]] = relationship(back_populates="log")
-
-    """El model de Plant debe tener esta linea"""
-    # logs: Mapped[List["Log"]] = relationship(back_populates="plant")
-
-    """Para yo luego poder desbloquear estas lineas"""
-    # plant_id: Mapped[int] = mapped_column(ForeignKey("dev.plants.id"))
-    # plant: Mapped["Plant"] = relationship(back_populates="logs")
+    plant_id: Mapped[int] = mapped_column(ForeignKey("dev.plants.id"))
+    plant: Mapped["Plant"] = relationship(back_populates="logs")
 
     def __repr__(self) -> str:
         return (
@@ -41,7 +37,7 @@ class Log(Base):
             f"updated_at={self.updated_at}), "
             f"content={self.content}), "
             f"photos={self.photos}), "
-            # f"plant_id={self.plant_id}"
+            f"plant_id={self.plant_id}"
         )
 
     @classmethod
@@ -53,7 +49,7 @@ class Log(Base):
             title=pydantic_obj.title,
             content=pydantic_obj.content,
             photos=photos,
-            # plant_id=pydantic_obj.plant_id
+            plant_id=pydantic_obj.plant_id
         )
 
 
