@@ -1,6 +1,6 @@
 from fastapi import Request
-from app.database.models.Log import Log
-from app.schemas.Log import (
+from app.database.models.log import Log
+from app.schemas.log import (
     LogCreateSchema
 )
 from app.utils.sql_exception_handling import withSQLExceptionsHandle
