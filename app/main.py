@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, status, Query
+from fastapi import FastAPI, Request, Response, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
 from app.controller import plant_controller
@@ -67,3 +67,11 @@ async def get_all_plants(req: Request,
 )
 async def get_one_plant(req: Request, id_plant: str):
     return plant_controller.get_plant(req, id_plant)
+
+
+@app.delete(
+    "/plants/{id_plant}",
+    status_code=status.HTTP_200_OK
+)
+async def delete_plant(response: Response, req: Request, id_plant: str):
+    return await plant_controller.delete_plant(response, req, id_plant)

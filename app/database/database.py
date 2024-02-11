@@ -55,3 +55,16 @@ class SQLAlchemyClient():
         query = select(Plants).where(Plants.user_id == id_user).limit(limit)
         result = self.session.scalars(query)
         return result
+    
+    def delete_by_id(self, id_received: str) -> int:
+        """
+        Delete a plant by id
+        Args:
+            id_received (str): id of the plant to delete
+        Returns:
+            int: number of rows affected. 0 if no rows were affected
+        """
+        query = delete(Plants).where(Plants.id == id_received)
+        result = self.session.execute(query)
+        self.session.commit()
+        return result.rowcount
