@@ -1,7 +1,7 @@
 from fastapi import Request, Response, status, HTTPException
-from app.database.models.plants import Plants
+from app.database.models.plant import Plant
 from app.schemas.plants import (
-    PlantsSchema,
+    PlantSchema,
 )
 import logging
 from psycopg2.errors import UniqueViolation
@@ -44,9 +44,9 @@ def withSQLExceptionsHandle(func):
 
 
 @withSQLExceptionsHandle
-def create_plant(req: Request, example: PlantsSchema):
+def create_plant(req: Request, example: PlantSchema):
     try:
-        req.app.database.add(Plants.from_pydantic(example))
+        req.app.database.add(Plant.from_pydantic(example))
         return req.app.database.find_by_id(example.id)
     except Exception as err:
         req.app.database.rollback()
@@ -66,7 +66,6 @@ def get_all_plants(req: Request, limit: int):
 @withSQLExceptionsHandle
 def get_all_plants_of_user(req: Request, id_user: str, limit: int):
     return req.app.database.find_all_by_user(id_user, limit)
-
 
 @withSQLExceptionsHandle
 async def delete_device_plant_association(
@@ -114,3 +113,4 @@ async def delete_plant(response: Response, req: Request, id_plant: str):
             return await delete_device_plant_association(response, id_plant, 0)
         else:
             raise err
+            
