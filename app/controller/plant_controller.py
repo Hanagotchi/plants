@@ -1,6 +1,6 @@
 from fastapi import Request, Response, status, HTTPException
 from app.database.models.plant import Plant
-from app.schemas.plants import (
+from app.schemas.plant import (
     PlantSchema,
 )
 import logging
