@@ -3,8 +3,8 @@ from app.database.database import SQLAlchemyClient
 import logging
 from app.controller import plant_controller
 from typing import List
-from app.schemas.plants import (
-    PlantsSchema,
+from app.schemas.plant import (
+    PlantSchema,
 )
 
 app = FastAPI()
@@ -39,20 +39,20 @@ async def root():
 @app.post(
     "/plants",
     status_code=status.HTTP_201_CREATED,
-    response_model=PlantsSchema
+    response_model=PlantSchema
 )
 async def create_plant(req: Request,
-                         item: PlantsSchema):
+                         item: PlantSchema):
     return plant_controller.create_plant(req, item)
 
 
 @app.get(
     "/plants",
     status_code=status.HTTP_200_OK,
-    response_model=List[PlantsSchema]
+    response_model=List[PlantSchema]
 )
 async def get_all_plants(req: Request,
-                      id_user: str = Query(None),
+                      id_user: int = Query(None),
                       limit: int = Query(1024)):
     if id_user is not None:
         return plant_controller.get_all_plants_of_user(req, id_user, limit)
@@ -63,7 +63,7 @@ async def get_all_plants(req: Request,
 @app.get(
     "/plants/{id_plant}",
     status_code=status.HTTP_200_OK,
-    response_model=PlantsSchema
+    response_model=PlantSchema
 )
 async def get_one_plant(req: Request, id_plant: str):
     return plant_controller.get_plant(req, id_plant)

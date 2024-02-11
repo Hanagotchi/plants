@@ -1,8 +1,8 @@
 from typing import Union
 from fastapi import Request, status, HTTPException
-from app.database.models.plants import Plants
-from app.schemas.plants import (
-    PlantsSchema,
+from app.database.models.plant import Plant
+from app.schemas.plant import (
+    PlantSchema,
 )
 import logging
 from psycopg2.errors import UniqueViolation
@@ -45,9 +45,9 @@ def withSQLExceptionsHandle(func):
 
 
 @withSQLExceptionsHandle
-def create_plant(req: Request, example: PlantsSchema):
+def create_plant(req: Request, example: PlantSchema):
     try:
-        req.app.database.add(Plants.from_pydantic(example))
+        req.app.database.add(Plant.from_pydantic(example))
         return req.app.database.find_by_id(example.id)
     except Exception as err:
         req.app.database.rollback()
@@ -64,5 +64,5 @@ def get_all_plants(req: Request, limit: int):
     return req.app.database.find_all(limit)
 
 @withSQLExceptionsHandle
-def get_all_plants_of_user(req: Request, id_user: str, limit: int):
+def get_all_plants_of_user(req: Request, id_user: int, limit: int):
     return req.app.database.find_all_by_user(id_user, limit)
