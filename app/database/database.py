@@ -32,12 +32,12 @@ class SQLAlchemyClient():
     def rollback(self):
         self.session.rollback()
 
-    def clean_table(self, table: Plants): #Union[Example, ...]):
+    def clean_table(self, table: Plants):  # Union[Example, ...]):
         query = delete(table)
         self.session.execute(query)
         self.session.commit()
 
-    def add(self, record: Plants): #Union[Example, ...]):
+    def add(self, record: Plants):  # Union[Example, ...]):
         self.session.add(record)
         self.session.commit()
 
@@ -50,12 +50,12 @@ class SQLAlchemyClient():
         query = select(Plants).limit(limit)
         result = self.session.scalars(query)
         return result
-    
+
     def find_all_by_user(self, id_user: str, limit: int) -> List[Plants]:
         query = select(Plants).where(Plants.user_id == id_user).limit(limit)
         result = self.session.scalars(query)
         return result
-    
+
     def delete_by_id(self, id_received: str) -> int:
         """
         Delete a plant by id

@@ -1,4 +1,3 @@
-from typing import Union
 from fastapi import Request, Response, status, HTTPException
 from app.database.models.plants import Plants
 from app.schemas.plants import (
@@ -23,25 +22,23 @@ def withSQLExceptionsHandle(func):
                 parsed_error = err.orig.pgerror.split("\n")
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail={
-                        "error": parsed_error[0],
-                        "detail": parsed_error[1]
-                    })
+                    detail={"error": parsed_error[0], "detail": parsed_error[1]},
+                )
 
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=format(err))
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=format(err)
+            )
 
         except PendingRollbackError as err:
             logger.warning(format(err))
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=format(err))
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=format(err)
+            )
 
         except NoResultFound as err:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=format(err))
+                status_code=status.HTTP_404_NOT_FOUND, detail=format(err)
+            )
 
     return handleSQLException
 
@@ -65,12 +62,16 @@ def get_plant(req: Request, id_received: str):
 def get_all_plants(req: Request, limit: int):
     return req.app.database.find_all(limit)
 
+
 @withSQLExceptionsHandle
 def get_all_plants_of_user(req: Request, id_user: str, limit: int):
     return req.app.database.find_all_by_user(id_user, limit)
 
+
 @withSQLExceptionsHandle
-async def delete_device_plant_association(response: Response, id_plant: str, result_plant: int) -> str:
+async def delete_device_plant_association(
+    response: Response, id_plant: str, result_plant: int
+) -> str:
     result_device_plant = await MeasurementService.delete_device_plant(id_plant)
     if result_device_plant.status_code == status.HTTP_200_OK:
         if result_plant == 0:
@@ -86,19 +87,24 @@ async def delete_device_plant_association(response: Response, id_plant: str, res
     else:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Could not delete device_plant relation"
+            detail="Could not delete device_plant relation",
         )
+
 
 async def delete_plant(response: Response, req: Request, id_plant: str):
     try:
         plant_to_delete = get_plant(req, id_plant)
         result_plant = req.app.database.delete_by_id(id_plant)
         try:
-            return await delete_device_plant_association(response, id_plant, result_plant)
+            return await delete_device_plant_association(
+                response, id_plant, result_plant
+            )
         except Exception as err:
-            logger.error("Could not delete device_plant relation! Rolling back plant deletion")
+            logger.error(
+                "Could not delete device_plant relation! Rolling back plant deletion"
+            )
             create_plant(req, plant_to_delete)
-            # req.app.database.rollback() - "It's not possible because an external asynchronous service 
+            # req.app.database.rollback() - "It's not possible because an external asynchronous service
             # was called and during the await's polling another database transaction could have been
             # executed over which we have no control!!"
             raise err
@@ -108,5 +114,3 @@ async def delete_plant(response: Response, req: Request, id_plant: str):
             return await delete_device_plant_association(response, id_plant, 0)
         else:
             raise err
-
-        

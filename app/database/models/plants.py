@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, SmallInteger
+from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database.models.base import Base
 from app.schemas.plants import PlantsSchema
