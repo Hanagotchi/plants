@@ -9,14 +9,14 @@ from typing import List
 load_dotenv()
 
 
-class SQLAlchemyClient():
+class SQLAlchemyClient:
     db_url = engine.URL.create(
         "postgresql",
         database=environ["PLANTS_DB"],
         username=environ["POSTGRES_USER"],
         password=environ["POSTGRES_PASSWORD"],
         host=environ["POSTGRES_HOST"],
-        port=environ["POSTGRES_PORT"]
+        port=environ["POSTGRES_PORT"],
     )
 
     engine = create_engine(db_url)
@@ -32,12 +32,12 @@ class SQLAlchemyClient():
     def rollback(self):
         self.session.rollback()
 
-    def clean_table(self, table: Plant): #Union[Example, ...]):
+    def clean_table(self, table: Plant):  # Union[Example, ...]):
         query = delete(table)
         self.session.execute(query)
         self.session.commit()
 
-    def add(self, record: Plant): #Union[Example, ...]):
+    def add(self, record: Plant):  # Union[Example, ...]):
         self.session.add(record)
         self.session.commit()
 
@@ -50,7 +50,7 @@ class SQLAlchemyClient():
         query = select(Plant).limit(limit)
         result = self.session.scalars(query)
         return result
-    
+
     def find_all_by_user(self, id_user: int, limit: int) -> List[Plant]:
         query = select(Plant).where(Plant.id_user == id_user).limit(limit)
         result = self.session.scalars(query)

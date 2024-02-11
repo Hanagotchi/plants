@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+
 
 class PlantSchema(BaseModel):
     id: int = Field(..., example=1)

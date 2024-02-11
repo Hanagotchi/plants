@@ -1,4 +1,3 @@
-from typing import Union
 from fastapi import Request, status, HTTPException
 from app.database.models.plant import Plant
 from app.schemas.plant import (
@@ -21,25 +20,23 @@ def withSQLExceptionsHandle(func):
                 parsed_error = err.orig.pgerror.split("\n")
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail={
-                        "error": parsed_error[0],
-                        "detail": parsed_error[1]
-                    })
+                    detail={"error": parsed_error[0], "detail": parsed_error[1]},
+                )
 
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=format(err))
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=format(err)
+            )
 
         except PendingRollbackError as err:
             logger.warning(format(err))
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=format(err))
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=format(err)
+            )
 
         except NoResultFound as err:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=format(err))
+                status_code=status.HTTP_404_NOT_FOUND, detail=format(err)
+            )
 
     return handleSQLException
 
@@ -62,6 +59,7 @@ def get_plant(req: Request, id_received: str):
 @withSQLExceptionsHandle
 def get_all_plants(req: Request, limit: int):
     return req.app.database.find_all(limit)
+
 
 @withSQLExceptionsHandle
 def get_all_plants_of_user(req: Request, id_user: int, limit: int):
