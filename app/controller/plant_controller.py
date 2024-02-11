@@ -5,7 +5,13 @@ from app.schemas.plant import (
 )
 import logging
 from psycopg2.errors import UniqueViolation
-from sqlalchemy.exc import PendingRollbackError, IntegrityError, NoResultFound
+from sqlalchemy.exc import (
+    PendingRollbackError,
+    DataError,
+    IntegrityError,
+    NoResultFound,
+    InternalError,
+)
 
 from app.service.measurements_service import MeasurementService
 
@@ -29,7 +35,7 @@ def withSQLExceptionsHandle(func):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=format(err)
             )
 
-        except PendingRollbackError as err:
+        except (PendingRollbackError, InternalError, DataError) as err:
             logger.warning(format(err))
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=format(err)
@@ -67,6 +73,7 @@ def get_all_plants(req: Request, limit: int):
 def get_all_plants_of_user(req: Request, id_user: str, limit: int):
     return req.app.database.find_all_by_user(id_user, limit)
 
+
 @withSQLExceptionsHandle
 async def delete_device_plant_association(
     response: Response, id_plant: str, result_plant: int
@@ -74,19 +81,19 @@ async def delete_device_plant_association(
     result_device_plant = await MeasurementService.delete_device_plant(id_plant)
     if result_device_plant.status_code == status.HTTP_200_OK:
         if result_plant == 0:
-            return "Successfully deleted plant_device relation but the plant was already deleted"
+            return "Successfully deleted DevicePlant relation but the Plant was already deleted"
         else:
-            return "Successfully deleted plant and plant_device relation"
+            return "Successfully deleted Plant and DevicePlant relation"
     elif result_device_plant.status_code == status.HTTP_204_NO_CONTENT:
         if result_plant == 0:
             response.status_code = status.HTTP_204_NO_CONTENT
             return
         else:
-            return "Successfully deleted plant but the plant_device relations was already deleted"
+            return "Successfully deleted Plant but the DevicePlant relations was already deleted"
     else:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Could not delete device_plant relation",
+            detail="Internal server error",
         )
 
 
@@ -100,7 +107,7 @@ async def delete_plant(response: Response, req: Request, id_plant: str):
             )
         except Exception as err:
             logger.error(
-                "Could not delete device_plant relation! Rolling back plant deletion"
+                "Could not delete DevicePlant relation! Rolling back plant deletion"
             )
             create_plant(req, plant_to_delete)
             # req.app.database.rollback() - "It's not possible because an external asynchronous service
@@ -112,5 +119,5 @@ async def delete_plant(response: Response, req: Request, id_plant: str):
             # Prevents the deletion of a device-plant association if the plant was not found!
             return await delete_device_plant_association(response, id_plant, 0)
         else:
+            req.app.database.rollback()
             raise err
-            

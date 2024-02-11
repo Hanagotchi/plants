@@ -47,8 +47,7 @@ async def shutdown_db_client():
     tags=["Plants"],
     responses={
         status.HTTP_200_OK: {"description": "Return the plant successfully created."},
-        status.HTTP_400_BAD_REQUEST:
-            {"description": "Invalid request body"},
+        status.HTTP_400_BAD_REQUEST: {"description": "Invalid request body"},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
@@ -67,8 +66,7 @@ async def create_plant(req: Request, item: PlantSchema):
         },
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid query parameters"},
         status.HTTP_404_NOT_FOUND: {"description": "Plants not found"},
-        status.HTTP_500_INTERNAL_SERVER_ERROR:
-            {"description": "Internal server error"},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
 async def get_all_plants(
@@ -90,13 +88,28 @@ async def get_all_plants(
         status.HTTP_404_NOT_FOUND: {
             "description": "The plant with the given ID was not found"
         },
-        status.HTTP_500_INTERNAL_SERVER_ERROR:
-            {"description": "Internal server error"},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
 async def get_one_plant(req: Request, id_plant: str):
     return plant_controller.get_plant(req, id_plant)
 
-@app.delete("/plants/{id_plant}", status_code=status.HTTP_200_OK)
+
+@app.delete(
+    "/plants/{id_plant}",
+    status_code=status.HTTP_200_OK,
+    tags=["Plants"],
+    responses={
+        status.HTTP_200_OK: {
+            "description": "Successfully deleted DevicePlant relation \
+                        but the Plant was already deleted OR Successfully deleted \
+                            Plant but the DevicePlant relations was already deleted."
+        },
+        status.HTTP_204_NO_CONTENT: {
+            "description": "Plant and DevicePlant relation was already deleted"
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
+    },
+)
 async def delete_plant(response: Response, req: Request, id_plant: str):
     return await plant_controller.delete_plant(response, req, id_plant)

@@ -41,19 +41,19 @@ paths:
       summary: Get All Plants
       operationId: get_all_plants_plants_get
       parameters:
-        - name: id_user
-          in: query
-          required: false
-          schema:
-            type: integer
-            title: Id User
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 1024
-            title: Limit
+      - name: id_user
+        in: query
+        required: false
+        schema:
+          type: integer
+          title: Id User
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1024
+          title: Limit
       responses:
         '200':
           description: Return all plants or the plants of the given user.
@@ -83,12 +83,12 @@ paths:
       summary: Get One Plant
       operationId: get_one_plant_plants__id_plant__get
       parameters:
-        - name: id_plant
-          in: path
-          required: true
-          schema:
-            type: string
-            title: Id Plant
+      - name: id_plant
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id Plant
       responses:
         '200':
           description: Return the plant with the given ID.
@@ -98,6 +98,34 @@ paths:
                 $ref: '#/components/schemas/PlantSchema'
         '404':
           description: The plant with the given ID was not found
+        '500':
+          description: Internal server error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - Plants
+      summary: Delete Plant
+      operationId: delete_plant_plants__id_plant__delete
+      parameters:
+      - name: id_plant
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id Plant
+      responses:
+        '200':
+          description: Successfully deleted DevicePlant relation but the Plant was already deleted OR Successfully deleted Plant but the DevicePlant relations was already deleted.
+          content:
+            application/json:
+              schema: {}
+        '204':
+          description: Plant and DevicePlant relation was already deleted
         '500':
           description: Internal server error
         '422':
