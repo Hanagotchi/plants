@@ -65,15 +65,15 @@ async def create_plant(req: Request, item: PlantSchema):
             "description": "Return all plants or the plants of the given user."
         },
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid query parameters"},
-        status.HTTP_404_NOT_FOUND: {"description": "Plants not found"},
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
+        status.HTTP_500_INTERNAL_SERVER_ERROR:
+            {"description": "Internal server error"},
     },
 )
 async def get_all_plants(
     req: Request, id_user: int = Query(None), limit: int = Query(1024)
 ):
     if id_user is not None:
-        return plant_controller.get_all_plants_of_user(req, id_user, limit)
+        return plant_controller.get_plants_by_user(req, id_user, limit)
 
     return plant_controller.get_all_plants(req, limit)
 

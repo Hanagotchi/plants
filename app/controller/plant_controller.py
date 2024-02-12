@@ -70,7 +70,7 @@ def get_all_plants(req: Request, limit: int):
 
 
 @withSQLExceptionsHandle
-def get_all_plants_of_user(req: Request, id_user: str, limit: int):
+def get_plants_by_user(req: Request, id_user: int, limit: int):
     return req.app.database.find_all_by_user(id_user, limit)
 
 
