@@ -1,12 +1,7 @@
-from typing import Union
-from fastapi import Request, status, HTTPException
-from app.database.models.example import Example
-from app.schemas.example import (
-    ExampleSchema,
-)
-import logging
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import PendingRollbackError, IntegrityError, NoResultFound
+from fastapi import status, HTTPException
+import logging
 
 logger = logging.getLogger("app")
 logger.setLevel("DEBUG")
@@ -42,23 +37,3 @@ def withSQLExceptionsHandle(func):
                 detail=format(err))
 
     return handleSQLException
-
-
-@withSQLExceptionsHandle
-def create_example(req: Request, example: ExampleSchema):
-    try:
-        req.app.database.add(Example.from_pydantic(example))
-        return req.app.database.find_by_id(example.id)
-    except Exception as err:
-        req.app.database.rollback()
-        raise err
-
-
-@withSQLExceptionsHandle
-def get_example(req: Request, id_received: str):
-    return req.app.database.find_by_id(id_received)
-
-
-@withSQLExceptionsHandle
-def get_all_example(req: Request, limit: int):
-    return req.app.database.find_all(limit)
