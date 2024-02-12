@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "plants" <<-'EOSQL'
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$PLANTS_DB" <<-'EOSQL'
     CREATE SCHEMA IF NOT EXISTS dev;
     CREATE TABLE 
         IF NOT EXISTS dev.plants (

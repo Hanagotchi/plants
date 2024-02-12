@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, status, Query
+from fastapi import FastAPI, Request, Response, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
 from app.controller import plant_controller, plant_types_controller
@@ -48,8 +48,7 @@ async def shutdown_db_client():
     tags=["Plants"],
     responses={
         status.HTTP_200_OK: {"description": "Return the plant successfully created."},
-        status.HTTP_400_BAD_REQUEST:
-            {"description": "Invalid request body"},
+        status.HTTP_400_BAD_REQUEST: {"description": "Invalid request body"},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
@@ -90,12 +89,31 @@ async def get_all_plants(
         status.HTTP_404_NOT_FOUND: {
             "description": "The plant with the given ID was not found"
         },
-        status.HTTP_500_INTERNAL_SERVER_ERROR:
-            {"description": "Internal server error"},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
 async def get_one_plant(req: Request, id_plant: str):
     return plant_controller.get_plant(req, id_plant)
+
+
+@app.delete(
+    "/plants/{id_plant}",
+    status_code=status.HTTP_200_OK,
+    tags=["Plants"],
+    responses={
+        status.HTTP_200_OK: {
+            "description": "Successfully deleted DevicePlant relation \
+                        but the Plant was already deleted OR Successfully deleted \
+                            Plant but the DevicePlant relations was already deleted."
+        },
+        status.HTTP_204_NO_CONTENT: {
+            "description": "Plant and DevicePlant relation was already deleted"
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
+    },
+)
+async def delete_plant(response: Response, req: Request, id_plant: str):
+    return await plant_controller.delete_plant(response, req, id_plant)
 
 
 @app.get(

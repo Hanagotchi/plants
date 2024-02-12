@@ -1,7 +1,6 @@
 version: '3.9'
 
 services:
-
   plants:
     build:
       context: .
@@ -11,8 +10,7 @@ services:
     ports:
       - ${PORT}:${PORT}
     depends_on:
-      sql:
-        condition: service_healthy
+      - measurements
     volumes:
       - ./app:/app/app
     tty: true

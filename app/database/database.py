@@ -50,6 +50,19 @@ class SQLAlchemyClient:
         result = self.session.scalars(query)
         return result
 
+    def delete_by_id(self, id_received: str) -> int:
+        """
+        Delete a plant by id
+        Args:
+            id_received (str): id of the plant to delete
+        Returns:
+            int: number of rows affected. 0 if no rows were affected
+        """
+        query = delete(Plant).where(Plant.id == id_received)
+        result = self.session.execute(query)
+        self.session.commit()
+        return result.rowcount
+
     def find_all_by_user(self, id_user: int, limit: int) -> List[Plant]:
         query = select(Plant).where(Plant.id_user == id_user).limit(limit)
         result = self.session.scalars(query)
