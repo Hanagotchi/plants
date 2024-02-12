@@ -1,19 +1,23 @@
-CREATE SCHEMA IF NOT EXISTS dev;
+#!/bin/bash
+set -e
 
-CREATE TABLE IF NOT EXISTS dev.plant_types (
-    botanical_name VARCHAR(70) PRIMARY KEY, 
-    common_name VARCHAR(70) NOT NULL, 
-    description VARCHAR(600) NOT NULL,
-    cares VARCHAR(600) NOT NULL, 
-    photo_link VARCHAR(120) NOT NULL
-);
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "plants" <<-'EOSQL'
+    CREATE SCHEMA IF NOT EXISTS dev;
 
-DO
-$do$
-BEGIN
-    IF (SELECT COUNT(*) FROM dev.plant_types) = 0 THEN
-        INSERT INTO dev.plant_types (botanical_name, common_name, description, cares, photo_link) VALUES 
-            (
+    CREATE TABLE IF NOT EXISTS dev.plant_types (
+        botanical_name VARCHAR(70) PRIMARY KEY,
+        common_name VARCHAR(70) NOT NULL,
+        description VARCHAR(600) NOT NULL,
+        cares VARCHAR(600) NOT NULL,
+        photo_link VARCHAR(120) NOT NULL
+    );
+
+    DO $do$
+    BEGIN
+        IF (SELECT COUNT(*) FROM dev.plant_types) = 0 THEN
+            INSERT INTO dev.plant_types (botanical_name, common_name, description, cares, photo_link)
+            VALUES 
+                 (
                 'Streptocarpus', 
                 'Cabo Primrose',
                 'Su nombre común es Cabo Primrose, refiriéndose al nombre de varias especies de Sudáfrica y su semejanza superficial al género Primula. El género es nativo de partes de África y Madagascar (con unas pocas especies extrañas en Asia, que probablemente no tienen cabida en el género). Las plantas a menudo crecen en la sombra de las laderas rocosas o acantilados. Se encuentran cada vez más sobre el terreno, grietas de rocas, y la semilla puede germinar y crecer casi en cualquier parte.',
@@ -41,6 +45,8 @@ BEGIN
                 'Requiere sol y agua en abundancia y es más feliz al aire libre a pleno sol y en un ambiente adecuadamente húmedo. Cuando se cultiva en interiores, se deben mantener estas condiciones subtropicales que conducirán a una planta de interior de Ixora coccinea saludable que florecerá durante todo el año.',
                 'https://cdn0.ecologiaverde.com/es/posts/3/4/8/planta_ixora_cuidados_1843_orig.jpg'
             );
-    END IF;
-END
-$do$;
+        END IF;
+    END
+    $do$;
+
+EOSQL

@@ -3,21 +3,23 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from os import environ
 
+from app.database.models.plant import Plant
 from app.database.models.base import Base
 from app.database.models.PlantType import PlantType
+
 from typing import List
 
 load_dotenv()
 
 
-class SQLAlchemyClient():
+class SQLAlchemyClient:
     db_url = engine.URL.create(
         "postgresql",
-        database=environ["POSTGRES_DB"],
+        database=environ["PLANTS_DB"],
         username=environ["POSTGRES_USER"],
         password=environ["POSTGRES_PASSWORD"],
         host=environ["POSTGRES_HOST"],
-        port=environ["POSTGRES_PORT"]
+        port=environ["POSTGRES_PORT"],
     )
 
     engine = create_engine(db_url)
@@ -37,6 +39,20 @@ class SQLAlchemyClient():
         query = delete(table)
         self.session.execute(query)
         self.session.commit()
+
+    def find_by_id(self, id_received: str) -> Plant:
+        query = select(Plant).where(Plant.id == id_received)
+        result = self.session.scalars(query).one()
+        return result
+
+    def find_all(self, limit: int) -> List[Plant]:
+        query = select(Plant).limit(limit)
+        result = self.session.scalars(query)
+        return result
+
+    def find_all_by_user(self, id_user: int, limit: int) -> List[Plant]:
+        query = select(Plant).where(Plant.id_user == id_user).limit(limit)
+        result = self.session.scalars(query)
 
     def add(self, record: Base):
         self.session.add(record)

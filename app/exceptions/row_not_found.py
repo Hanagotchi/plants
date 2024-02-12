@@ -4,4 +4,5 @@ class RowNotFoundError(Exception):
         self.name_table = name_table
         super().__init__(
             f"Row with id = {self.primary_key} not \
-            found in {self.name_table.upper()} table.")
+            found in {self.name_table.upper()} table."
+        )
