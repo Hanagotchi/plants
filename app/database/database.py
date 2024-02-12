@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 from os import environ
 
 from app.database.models.plant import Plant
+from app.database.models.base import Base
+from app.database.models.PlantType import PlantType
+
 from typing import List
 
 load_dotenv()
@@ -32,13 +35,9 @@ class SQLAlchemyClient:
     def rollback(self):
         self.session.rollback()
 
-    def clean_table(self, table: Plant):  # Union[Example, ...]):
+    def clean_table(self, table: Base):
         query = delete(table)
         self.session.execute(query)
-        self.session.commit()
-
-    def add(self, record: Plant):  # Union[Example, ...]):
-        self.session.add(record)
         self.session.commit()
 
     def find_by_id(self, id_received: str) -> Plant:
@@ -67,4 +66,19 @@ class SQLAlchemyClient:
     def find_all_by_user(self, id_user: int, limit: int) -> List[Plant]:
         query = select(Plant).where(Plant.id_user == id_user).limit(limit)
         result = self.session.scalars(query)
+
+    def add(self, record: Base):
+        self.session.add(record)
+        self.session.commit()
+
+    def find_all_plant_types(self, limit: int) -> List[PlantType]:
+        query = select(PlantType).limit(limit)
+        result = self.session.scalars(query)
+        return result
+
+    def find_plant_type_by_botanical_name(
+            self, botanical_name_given: str) -> PlantType:
+        query = select(PlantType).where(
+            PlantType.botanical_name == botanical_name_given)
+        result = self.session.scalars(query).one()
         return result

@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Request, Response, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
-from app.controller import plant_controller
-from typing import List
+from app.controller import plant_controller, plant_types_controller
+from typing import List, Optional
 from app.schemas.plant import (
     PlantSchema,
 )
+from app.schemas.plant_type import PlantTypeSchema
 
 tags_metadata = [
     {"name": "Plants", "description": "Operations with plants."},
@@ -113,3 +114,22 @@ async def get_one_plant(req: Request, id_plant: str):
 )
 async def delete_plant(response: Response, req: Request, id_plant: str):
     return await plant_controller.delete_plant(response, req, id_plant)
+@app.get(
+    "/plant-type",
+    status_code=status.HTTP_200_OK,
+    response_model=List[PlantTypeSchema]
+)
+async def get_all_plant_types(req: Request, limit: Optional[int] = None):
+    return plant_types_controller.get_all_plant_types(req, limit)
+
+
+@app.get(
+    "/plant-type/{botanical_name}",
+    status_code=status.HTTP_200_OK,
+    response_model=PlantTypeSchema
+)
+async def get_plant_type(
+    botanical_name: str,
+    req: Request,
+):
+    return plant_types_controller.get_plant_type(req, botanical_name)
