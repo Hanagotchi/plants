@@ -25,4 +25,4 @@ class MeasurementService:
 
     @staticmethod
     async def delete_device_plant(plant_id: str):
-        return await MeasurementService.delete(f"/device-plant/?plant_id={plant_id}")
+        return await MeasurementService.delete(f"/device-plant/{plant_id}?type_id=id_plant")
