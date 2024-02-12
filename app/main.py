@@ -1,11 +1,8 @@
-from fastapi import FastAPI, Request, status, Query
+from fastapi import FastAPI, Request, status
 from app.database.database import SQLAlchemyClient
 import logging
-from app.controller import example_controller, plant_types_controller
+from app.controller import plant_types_controller
 from typing import List, Optional
-from app.schemas.example import (
-    ExampleSchema,
-)
 from app.schemas.plant_type import PlantTypeSchema
 
 app = FastAPI()
@@ -35,29 +32,6 @@ async def shutdown_db_client():
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-
-@app.post(
-    "/example",
-    status_code=status.HTTP_201_CREATED,
-    response_model=ExampleSchema
-)
-async def create_example(req: Request,
-                         item: ExampleSchema):
-    return example_controller.create_example(req, item)
-
-
-@app.get(
-    "/example",
-    status_code=status.HTTP_200_OK,
-    response_model=List[ExampleSchema]
-)
-async def get_example(req: Request,
-                      id_example: str = Query(None),
-                      limit: int = Query(10)):
-    if id_example is None:
-        return example_controller.get_all_example(req, limit)
-    return [example_controller.get_example(req, id_example)]
 
 
 @app.get(
