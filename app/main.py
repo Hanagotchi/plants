@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
 from app.controller import plant_controller, plant_types_controller
