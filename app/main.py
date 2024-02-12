@@ -114,6 +114,8 @@ async def get_one_plant(req: Request, id_plant: str):
 )
 async def delete_plant(response: Response, req: Request, id_plant: str):
     return await plant_controller.delete_plant(response, req, id_plant)
+
+
 @app.get(
     "/plant-type",
     status_code=status.HTTP_200_OK,
