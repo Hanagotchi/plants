@@ -9,7 +9,7 @@ class Plant(Base):
     __tablename__ = "plants"
     __table_args__ = {"schema": "dev"}
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     id_user: Mapped[int] = mapped_column(Integer, nullable=False)
     name: Mapped[str] = mapped_column(String(64), nullable=False)
     scientific_name: Mapped[str] = mapped_column(String(64), nullable=False)

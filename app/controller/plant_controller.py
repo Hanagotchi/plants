@@ -52,8 +52,9 @@ def withSQLExceptionsHandle(func):
 @withSQLExceptionsHandle
 def create_plant(req: Request, example: PlantCreateSchema):
     try:
-        req.app.database.add(Plant.from_pydantic(example))
-        return req.app.database.find_by_id(example.id)
+        plant: Plant = Plant.from_pydantic(example)
+        req.app.database.add(plant)
+        return req.app.database.find_by_id(plant.id)
     except Exception as err:
         req.app.database.rollback()
         raise err
