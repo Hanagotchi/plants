@@ -10,7 +10,7 @@ from app.controller import (
 )
 from typing import List, Optional
 from app.schemas.plant import (
-    PlantSchema,
+    PlantSchema, PlantCreateSchema
 )
 from app.schemas.plant_type import PlantTypeSchema
 
@@ -58,7 +58,7 @@ async def shutdown_db_client():
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
-async def create_plant(req: Request, item: PlantSchema):
+async def create_plant(req: Request, item: PlantCreateSchema):
     return plant_controller.create_plant(req, item)
 
 
