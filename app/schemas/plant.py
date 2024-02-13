@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from typing import List
+from app.schemas.log import LogSchema
 
 
 class PlantCreateSchema(BaseModel):
@@ -9,4 +11,4 @@ class PlantCreateSchema(BaseModel):
 
 class PlantSchema(PlantCreateSchema):
     id: int = Field(..., example=1)
-
+    logs: List[LogSchema] = Field(...)

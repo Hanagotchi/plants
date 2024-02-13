@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.models.base import Base
 from app.schemas.plant import PlantCreateSchema, PlantSchema
@@ -12,7 +12,7 @@ class Plant(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     id_user: Mapped[int] = mapped_column(Integer, nullable=False)
     name: Mapped[str] = mapped_column(String(64), nullable=False)
-    scientific_name: Mapped[str] = mapped_column(String(64), nullable=False)
+    scientific_name: Mapped[str] = mapped_column(ForeignKey("dev.plant_type.botanical_name"))
     logs: Mapped[List["Log"]] = relationship(back_populates="plant")
 
     def __repr__(self) -> str:
