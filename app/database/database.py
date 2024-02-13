@@ -65,6 +65,7 @@ class SQLAlchemyClient:
     def find_all_by_user(self, id_user: int, limit: int) -> List[Plant]:
         query = select(Plant).where(Plant.id_user == id_user).limit(limit)
         result = self.session.scalars(query)
+        return result
 
     def add(self, record: Base):
         self.session.add(record)

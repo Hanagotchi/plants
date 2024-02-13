@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.models.base import Base
-from app.schemas.plant import PlantCreateSchema, PlantSchema
+from app.schemas.plant import PlantCreateSchema
 from typing import List
 
 
