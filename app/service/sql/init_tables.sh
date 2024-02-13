@@ -1,19 +1,23 @@
-CREATE SCHEMA IF NOT EXISTS dev;
+#!/bin/bash
+set -e
 
-CREATE TABLE IF NOT EXISTS dev.plant_types (
-    botanical_name VARCHAR(70) PRIMARY KEY, 
-    common_name VARCHAR(70) NOT NULL, 
-    description VARCHAR(600) NOT NULL,
-    cares VARCHAR(600) NOT NULL, 
-    photo_link VARCHAR(120) NOT NULL
-);
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "plants" <<-'EOSQL'
+    CREATE SCHEMA IF NOT EXISTS dev;
 
-DO
-$do$
-BEGIN
-    IF (SELECT COUNT(*) FROM dev.plant_types) = 0 THEN
-        INSERT INTO dev.plant_types (botanical_name, common_name, description, cares, photo_link) VALUES 
-            (
+    CREATE TABLE IF NOT EXISTS dev.plant_types (
+        botanical_name VARCHAR(70) PRIMARY KEY,
+        common_name VARCHAR(70) NOT NULL,
+        description VARCHAR(600) NOT NULL,
+        cares VARCHAR(600) NOT NULL,
+        photo_link VARCHAR(120) NOT NULL
+    );
+
+    DO $do$
+    BEGIN
+        IF (SELECT COUNT(*) FROM dev.plant_types) = 0 THEN
+            INSERT INTO dev.plant_types (botanical_name, common_name, description, cares, photo_link)
+            VALUES 
+                 (
                 'Streptocarpus', 
                 'Cabo Primrose',
                 'Su nombre común es Cabo Primrose, refiriéndose al nombre de varias especies de Sudáfrica y su semejanza superficial al género Primula. El género es nativo de partes de África y Madagascar (con unas pocas especies extrañas en Asia, que probablemente no tienen cabida en el género). Las plantas a menudo crecen en la sombra de las laderas rocosas o acantilados. Se encuentran cada vez más sobre el terreno, grietas de rocas, y la semilla puede germinar y crecer casi en cualquier parte.',
@@ -41,6 +45,63 @@ BEGIN
                 'Requiere sol y agua en abundancia y es más feliz al aire libre a pleno sol y en un ambiente adecuadamente húmedo. Cuando se cultiva en interiores, se deben mantener estas condiciones subtropicales que conducirán a una planta de interior de Ixora coccinea saludable que florecerá durante todo el año.',
                 'https://cdn0.ecologiaverde.com/es/posts/3/4/8/planta_ixora_cuidados_1843_orig.jpg'
             );
-    END IF;
-END
-$do$;
+        END IF;
+    END
+    $do$;
+
+    CREATE TABLE 
+        IF NOT EXISTS dev.plants (
+            id SERIAL PRIMARY KEY, 
+            id_user INT NOT NULL,
+            name VARCHAR(64) NOT NULL, 
+            scientific_name VARCHAR(70) NOT NULL,
+            CONSTRAINT fk_plant_type
+                FOREIGN KEY (scientific_name)
+                    REFERENCES dev.plant_types(botanical_name)
+
+    );
+
+    DO $do$ BEGIN
+        IF (SELECT COUNT(*) FROM dev.plants) = 0 THEN
+            INSERT INTO dev.plants (id_user, name, scientific_name) VALUES 
+                (1, 'Rosa', 'Streptocarpus'),
+                (2, 'Margarita', 'Pilea microphylla'),
+                (3, 'Girasol', 'Pentas lanceolata');
+        END IF;
+    END $do$;
+
+    CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+    RETURNS TRIGGER AS $$
+    BEGIN
+        NEW.updated_at = NOW();
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TABLE IF NOT EXISTS dev.logs (
+        id SERIAL PRIMARY KEY, 
+        title VARCHAR(200) NOT NULL, 
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+        content VARCHAR(1000) NOT NULL,
+        plant_id INT,
+        CONSTRAINT fk_plant
+            FOREIGN KEY (plant_id)
+                REFERENCES dev.plants(id)
+    );
+
+    CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON dev.logs
+    FOR EACH ROW
+    EXECUTE FUNCTION trigger_set_timestamp();
+
+    CREATE TABLE IF NOT EXISTS dev.logs_photos (
+        id SERIAL PRIMARY KEY,
+        log_id INT,
+        photo_link VARCHAR(120) NOT NULL, 
+        CONSTRAINT fk_log
+            FOREIGN KEY (log_id)
+                REFERENCES dev.logs(id)
+    );
+
+EOSQL
