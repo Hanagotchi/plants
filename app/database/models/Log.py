@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import List
 from app.database.models.plant import Plant
 
-from app.schemas.log import LogCreateSchema
+from app.schemas.Log import LogCreateSchema
 
 
 class Log(Base):

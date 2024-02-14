@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, Response, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
-from app.schemas.log import LogCreateSchema, LogSchema
+from app.schemas.Log import LogCreateSchema, LogSchema
 from app.controller import (
     plant_controller,
     plant_types_controller,

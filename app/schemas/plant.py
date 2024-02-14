@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List
-from app.schemas.log import LogSchema
+from app.schemas.Log import LogSchema
 
 
 class PlantCreateSchema(BaseModel):
