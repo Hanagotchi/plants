@@ -43,8 +43,6 @@ class LogCreateSchema(BaseModel):
                 "content": ("Mi buena petuña es hermosa. "
                             "Crece, crece y crece, "
                             "y en verano me da mandarinas."),
-                "created_at": "2024-02-07T21:23:13.548658",
-                "updated_at": "2024-02-07T21:23:13.548658",
                 "plant_id": 4,
                 "photos":
                 [

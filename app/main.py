@@ -123,6 +123,7 @@ async def delete_plant(response: Response, req: Request, id_plant: str):
 
 @app.get(
     "/plant-type",
+    tags=["Plant types"],
     status_code=status.HTTP_200_OK,
     response_model=List[PlantTypeSchema]
 )
@@ -132,6 +133,7 @@ async def get_all_plant_types(req: Request, limit: Optional[int] = None):
 
 @app.get(
     "/plant-type/{botanical_name}",
+    tags=["Plant types"],
     status_code=status.HTTP_200_OK,
     response_model=PlantTypeSchema
 )
@@ -145,6 +147,7 @@ async def get_plant_type(
 @app.post(
     "/logs",
     status_code=status.HTTP_201_CREATED,
+    tags=["Logs"],
     response_model=LogSchema
 )
 async def create_log(
