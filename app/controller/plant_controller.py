@@ -54,7 +54,7 @@ def create_plant(req: Request, example: PlantCreateSchema):
     try:
         plant: Plant = Plant.from_pydantic(example)
         req.app.database.add(plant)
-        return req.app.database.find_by_id(plant.id)
+        return req.app.database.get_plant_by_id(plant.id)
     except Exception as err:
         req.app.database.rollback()
         raise err
@@ -62,17 +62,17 @@ def create_plant(req: Request, example: PlantCreateSchema):
 
 @withSQLExceptionsHandle
 def get_plant(req: Request, id_received: str):
-    return req.app.database.find_by_id(id_received)
+    return req.app.database.get_plant_by_id(id_received)
 
 
 @withSQLExceptionsHandle
 def get_all_plants(req: Request, limit: int):
-    return req.app.database.find_all(limit)
+    return req.app.database.get_all_plants(limit)
 
 
 @withSQLExceptionsHandle
 def get_plants_by_user(req: Request, id_user: int, limit: int):
-    return req.app.database.find_all_by_user(id_user, limit)
+    return req.app.database.get_all_plants_by_user(id_user, limit)
 
 
 @withSQLExceptionsHandle
@@ -101,7 +101,7 @@ async def delete_device_plant_association(
 async def delete_plant(response: Response, req: Request, id_plant: str):
     try:
         plant_to_delete = get_plant(req, id_plant)
-        result_plant = req.app.database.delete_by_id(id_plant)
+        result_plant = req.app.database.delete_plant(id_plant)
         try:
             return await delete_device_plant_association(
                 response, id_plant, result_plant

@@ -2,8 +2,7 @@ from sqlalchemy import create_engine, select, delete, engine
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from os import environ
-
-from app.database.models.Log import Log, LogPhoto
+from app.database.models.Log import Log
 from app.database.models.base import Base
 from app.database.models.plant_type import PlantType
 from app.database.models.plant import Plant
@@ -42,17 +41,17 @@ class SQLAlchemyClient:
         self.session.execute(query)
         self.session.commit()
 
-    def find_by_id(self, id_received: str) -> Plant:
+    def get_plant_by_id(self, id_received: str) -> Plant:
         query = select(Plant).where(Plant.id == id_received)
         result = self.session.scalars(query).one()
         return result
 
-    def find_all(self, limit: int) -> List[Plant]:
+    def get_all_plants(self, limit: int) -> List[Plant]:
         query = select(Plant).limit(limit)
         result = self.session.scalars(query)
         return result
 
-    def delete_by_id(self, id_received: str) -> int:
+    def delete_plant(self, id_received: str) -> int:
         """
         Delete a plant by id
         Args:
@@ -65,7 +64,7 @@ class SQLAlchemyClient:
         self.session.commit()
         return result.rowcount
 
-    def find_all_by_user(self, id_user: int, limit: int) -> List[Plant]:
+    def get_all_plants_by_user(self, id_user: int, limit: int) -> List[Plant]:
         query = select(Plant).where(Plant.id_user == id_user).limit(limit)
         result = self.session.scalars(query)
         return result
@@ -74,24 +73,23 @@ class SQLAlchemyClient:
         self.session.add(record)
         self.session.commit()
 
-    def find_all_plant_types(self, limit: int) -> List[PlantType]:
+    def get_all_plant_types(self, limit: int) -> List[PlantType]:
         query = select(PlantType).limit(limit)
         result = self.session.scalars(query)
         return result
 
-    def find_logs_between(self,
-                          user_id: int,
-                          cleft: date,
-                          cright: date) -> List[Log]:
-        # where(Log.plant.user_id == user_id).\
+    def get_logs_between(self,
+                         user_id: int,
+                         cleft: date,
+                         cright: date) -> List[Log]:
         query = select(Log).\
                 where(Log.created_at.between(cleft, cright)).\
-                where(Log.photos.any(LogPhoto.id == 3)).\
+                where(Log.plant.has(Plant.id_user == user_id)).\
                 order_by(Log.created_at.asc())
         result = self.session.scalars(query)
         return result
 
-    def find_plant_type_by_botanical_name(
+    def get_plant_type_by_botanical_name(
             self, botanical_name_given: str) -> PlantType:
         query = select(PlantType).where(
             PlantType.botanical_name == botanical_name_given)

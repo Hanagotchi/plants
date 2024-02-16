@@ -31,4 +31,4 @@ def get_logs_by_user(req: Request,
         left = date(year, 1, 1)
         right = date(year+1, 1, 1)
 
-    return req.app.database.find_logs_between(user_id, left, right)
+    return req.app.database.get_logs_between(user_id, left, right)
