@@ -1,0 +1,196 @@
+openapi: 3.1.0
+info:
+  title: Plants API
+  summary: Microservice for plants management
+  version: 0.1.0
+paths:
+  /plants:
+    post:
+      tags:
+        - Plants
+      summary: Create Plant
+      operationId: create_plant_plants_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlantSchema'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantSchema'
+        '200':
+          description: Return the plant successfully created.
+        '400':
+          description: Invalid request body
+        '500':
+          description: Internal server error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+        - Plants
+      summary: Get All Plants
+      operationId: get_all_plants_plants_get
+      parameters:
+      - name: id_user
+        in: query
+        required: false
+        schema:
+          type: integer
+          title: Id User
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 1024
+          title: Limit
+      responses:
+        '200':
+          description: Return all plants or the plants of the given user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlantSchema'
+                title: Response Get All Plants Plants Get
+        '400':
+          description: Invalid query parameters
+        '404':
+          description: Plants not found
+        '500':
+          description: Internal server error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/plants/{id_plant}':
+    get:
+      tags:
+        - Plants
+      summary: Get One Plant
+      operationId: get_one_plant_plants__id_plant__get
+      parameters:
+      - name: id_plant
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id Plant
+      responses:
+        '200':
+          description: Return the plant with the given ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantSchema'
+        '404':
+          description: The plant with the given ID was not found
+        '500':
+          description: Internal server error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - Plants
+      summary: Delete Plant
+      operationId: delete_plant_plants__id_plant__delete
+      parameters:
+      - name: id_plant
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Id Plant
+      responses:
+        '200':
+          description: Successfully deleted DevicePlant relation but the Plant was already deleted OR Successfully deleted Plant but the DevicePlant relations was already deleted.
+          content:
+            application/json:
+              schema: {}
+        '204':
+          description: Plant and DevicePlant relation was already deleted
+        '500':
+          description: Internal server error
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    PlantSchema:
+      properties:
+        id:
+          type: integer
+          title: Id
+          example: 1
+        id_user:
+          type: integer
+          title: Id User
+          example: 1
+        name:
+          type: string
+          title: Name
+          example: Agus
+        scientific_name:
+          type: string
+          title: Scientific Name
+          example: Aguspolis grandis
+      type: object
+      required:
+        - id
+        - id_user
+        - name
+        - scientific_name
+      title: PlantSchema
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
+tags:
+  - name: Plants
+    description: Operations with plants.

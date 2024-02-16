@@ -1,0 +1,144 @@
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.1.0
+paths:
+  /:
+    get:
+      summary: Root
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  
+  /plant-type:
+    get:
+      tags:
+        - PlantType
+      summary: Get All Plant Types
+      description: A limit can be provided to limit the info amount
+      operationId: get_all_plant_types_plant_type_get
+      parameters:
+        - name: limit
+          in: query
+          description: Limits the amount of data.
+          required: false
+          schema:
+            type: integer
+            default: 10
+            title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlantTypeSchema'
+                title: Response Get All Plant Types Plant Type Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /plant-type/{botanical_name}:
+    get:
+      tags:
+        - PlantType
+      summary: Get Plant Type
+      operationId: get_plant_type_plant_type__botanical_name__get
+      parameters:
+        - name: botanical_name
+          in: path
+          description: The scientific name of the plant.
+          required: true
+          schema:
+            type: string
+            title: Botanical Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantTypeSchema'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    PlantTypeSchema:
+      properties:
+        botanical_name:
+          type: string
+          maxLength: 70
+          title: Botanical Name
+        common_name:
+          type: string
+          maxLength: 70
+          title: Common Name
+        description:
+          type: string
+          maxLength: 600
+          title: Description
+        cares:
+          type: string
+          maxLength: 600
+          title: Cares
+        photo_link:
+          type: string
+          maxLength: 120
+          title: Photo Link
+      type: object
+      required:
+        - botanical_name
+        - common_name
+        - description
+        - cares
+        - photo_link
+      title: PlantTypeSchema
+      example:
+        botanical_name: Streptocarpus
+        cares: Se desempeña mejor con luz brillante filtrada y...
+        common_name: Cabo Primrose
+        description: Su nombre común es Cabo Primrose, refiriéndose...
+        photo_link: >-
+          https://www.whiteflowerfarm.com/mas_assets/cache/image/3/e/e/2/16098.Jpg
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError

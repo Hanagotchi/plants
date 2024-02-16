@@ -13,6 +13,22 @@ Where `PORT` is the port where the microservice is running defined in the [env](
 
 Environment variables are defined in the [env.example](.env.example) file.
 
+## README
+
+### Environment Variables
+
+- `PORT`: The port number on which the application will run. Example value: `8081`.
+- `POSTGRES_USER`: The username to connect to the PostgreSQL database. Example value: `user`.
+- `POSTGRES_PASSWORD`: The password to connect to the PostgreSQL database. Example value: `1234`.
+- `PLANTS_DB`: The name of the database containing plant-related data. Example value: `plants`.
+- `POSTGRES_HOST`: The hostname or IP address of the PostgreSQL server. Example value: `sql`.
+- `POSTGRES_PORT`: The port number of the PostgreSQL server. Example value: `5432`.
+- `LOGGING_LEVEL`: The logging level for the application. Example value: `DEBUG`.
+- `DATABASE_URL`: The URL for connecting to the PostgreSQL database in the format `postgresql://<username>:<password>@<host>:<port>/<database>`. Example value: `postgresql://user:1234@sql:5432/plants`.
+- `MEASUREMENTS_SERVICE_URL`: The URL for communicating with the measurements microservice. Example value: `http://measurements:8080`.
+- `MEASUREMENTS_DB`: The name of the database containing measurements data. Example value: `measurements`.
+
+
 ## Poetry
 
 This project uses [Poetry](https://python-poetry.org/) to manage dependencies.
