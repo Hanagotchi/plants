@@ -1,10 +1,15 @@
 from fastapi import FastAPI, Request, Response, status, Query
 from app.database.database import SQLAlchemyClient
 import logging
-from app.controller import plant_controller, plant_types_controller
+from app.schemas.Log import LogCreateSchema, LogSchema
+from app.controller import (
+    plant_controller,
+    plant_types_controller,
+    log_controller
+)
 from typing import List, Optional
 from app.schemas.plant import (
-    PlantSchema,
+    PlantSchema, PlantCreateSchema
 )
 from app.schemas.plant_type import PlantTypeSchema
 
@@ -52,7 +57,7 @@ async def shutdown_db_client():
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
-async def create_plant(req: Request, item: PlantSchema):
+async def create_plant(req: Request, item: PlantCreateSchema):
     return plant_controller.create_plant(req, item)
 
 
@@ -118,6 +123,7 @@ async def delete_plant(response: Response, req: Request, id_plant: str):
 
 @app.get(
     "/plant-type",
+    tags=["Plant types"],
     status_code=status.HTTP_200_OK,
     response_model=List[PlantTypeSchema]
 )
@@ -127,6 +133,7 @@ async def get_all_plant_types(req: Request, limit: Optional[int] = None):
 
 @app.get(
     "/plant-type/{botanical_name}",
+    tags=["Plant types"],
     status_code=status.HTTP_200_OK,
     response_model=PlantTypeSchema
 )
@@ -135,3 +142,15 @@ async def get_plant_type(
     req: Request,
 ):
     return plant_types_controller.get_plant_type(req, botanical_name)
+
+
+@app.post(
+    "/logs",
+    status_code=status.HTTP_201_CREATED,
+    tags=["Logs"],
+    response_model=LogSchema
+)
+async def create_log(
+    req: Request, item: LogCreateSchema
+):
+    return log_controller.create_log(req, item)

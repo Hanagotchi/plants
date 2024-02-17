@@ -2,10 +2,9 @@ from sqlalchemy import create_engine, select, delete, engine
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from os import environ
-
-from app.database.models.plant import Plant
 from app.database.models.base import Base
-from app.database.models.PlantType import PlantType
+from app.database.models.plant_type import PlantType
+from app.database.models.plant import Plant
 
 from typing import List
 
@@ -66,6 +65,7 @@ class SQLAlchemyClient:
     def find_all_by_user(self, id_user: int, limit: int) -> List[Plant]:
         query = select(Plant).where(Plant.id_user == id_user).limit(limit)
         result = self.session.scalars(query)
+        return result
 
     def add(self, record: Base):
         self.session.add(record)

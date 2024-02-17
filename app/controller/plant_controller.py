@@ -1,7 +1,7 @@
 from fastapi import Request, Response, status, HTTPException
 from app.database.models.plant import Plant
 from app.schemas.plant import (
-    PlantSchema,
+    PlantCreateSchema,
 )
 import logging
 from psycopg2.errors import UniqueViolation
@@ -50,10 +50,11 @@ def withSQLExceptionsHandle(func):
 
 
 @withSQLExceptionsHandle
-def create_plant(req: Request, example: PlantSchema):
+def create_plant(req: Request, example: PlantCreateSchema):
     try:
-        req.app.database.add(Plant.from_pydantic(example))
-        return req.app.database.find_by_id(example.id)
+        plant: Plant = Plant.from_pydantic(example)
+        req.app.database.add(plant)
+        return req.app.database.find_by_id(plant.id)
     except Exception as err:
         req.app.database.rollback()
         raise err
