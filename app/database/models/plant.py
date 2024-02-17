@@ -1,17 +1,18 @@
-from sqlalchemy import Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.models.base import Base
-from app.schemas.plant import PlantSchema
+from app.schemas.plant import PlantCreateSchema
+from typing import List
 
 
 class Plant(Base):
     __tablename__ = "plants"
     __table_args__ = {"schema": "dev"}
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     id_user: Mapped[int] = mapped_column(Integer, nullable=False)
     name: Mapped[str] = mapped_column(String(64), nullable=False)
-    scientific_name: Mapped[str] = mapped_column(String(64), nullable=False)
+    scientific_name: Mapped[str] = mapped_column(ForeignKey("dev.plant_type.botanical_name"))
 
     def __repr__(self) -> str:
         return (
@@ -20,10 +21,9 @@ class Plant(Base):
         )
 
     @classmethod
-    def from_pydantic(cls, pydantic_obj: PlantSchema):
+    def from_pydantic(cls, pydantic_obj: PlantCreateSchema):
         return Plant(
-            id=pydantic_obj.id,
             id_user=pydantic_obj.id_user,
             name=pydantic_obj.name,
-            scientific_name=pydantic_obj.scientific_name,
+            scientific_name=pydantic_obj.scientific_name
         )

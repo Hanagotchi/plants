@@ -43,8 +43,7 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - ./app/service/sql/init_database_plants.sh:/docker-entrypoint-initdb.d/init_database_plants.sh
-      - ./app/service/sql/init_table_plants.sh:/docker-entrypoint-initdb.d/init_table_plants.sh
-      - ./app/service/sql/init_table_plant_types.sh:/docker-entrypoint-initdb.d/init_table_plant_types.sh
+      - ./app/service/sql/init_tables.sh:/docker-entrypoint-initdb.d/init_tables.sh
       - ../measurements/app/service/sql/init_database_measurements.sh:/docker-entrypoint-initdb.d/init_database_measurements.sh
       - ../measurements/app/service/sql/init_table_device_plant.sh:/docker-entrypoint-initdb.d/init_table_device_plant.sh
       - ../measurements/app/service/sql/init_table_measurements.sh:/docker-entrypoint-initdb.d/init_table_measurements.sh

@@ -49,4 +49,59 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "plants" <<-'EOSQL'
     END
     $do$;
 
+    CREATE TABLE 
+        IF NOT EXISTS dev.plants (
+            id SERIAL PRIMARY KEY, 
+            id_user INT NOT NULL,
+            name VARCHAR(64) NOT NULL, 
+            scientific_name VARCHAR(70) NOT NULL,
+            CONSTRAINT fk_plant_type
+                FOREIGN KEY (scientific_name)
+                    REFERENCES dev.plant_types(botanical_name)
+
+    );
+
+    DO $do$ BEGIN
+        IF (SELECT COUNT(*) FROM dev.plants) = 0 THEN
+            INSERT INTO dev.plants (id_user, name, scientific_name) VALUES 
+                (1, 'Rosa', 'Streptocarpus'),
+                (2, 'Margarita', 'Pilea microphylla'),
+                (3, 'Girasol', 'Pentas lanceolata');
+        END IF;
+    END $do$;
+
+    CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+    RETURNS TRIGGER AS $$
+    BEGIN
+        NEW.updated_at = NOW();
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TABLE IF NOT EXISTS dev.logs (
+        id SERIAL PRIMARY KEY, 
+        title VARCHAR(200) NOT NULL, 
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+        content VARCHAR(1000) NOT NULL,
+        plant_id INT,
+        CONSTRAINT fk_plant
+            FOREIGN KEY (plant_id)
+                REFERENCES dev.plants(id)
+    );
+
+    CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON dev.logs
+    FOR EACH ROW
+    EXECUTE FUNCTION trigger_set_timestamp();
+
+    CREATE TABLE IF NOT EXISTS dev.logs_photos (
+        id SERIAL PRIMARY KEY,
+        log_id INT,
+        photo_link VARCHAR(120) NOT NULL, 
+        CONSTRAINT fk_log
+            FOREIGN KEY (log_id)
+                REFERENCES dev.logs(id)
+    );
+
 EOSQL
