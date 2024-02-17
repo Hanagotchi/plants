@@ -11,4 +11,3 @@ class PlantCreateSchema(BaseModel):
 
 class PlantSchema(PlantCreateSchema):
     id: int = Field(..., example=1)
-    logs: List[LogSchema] = Field(...)

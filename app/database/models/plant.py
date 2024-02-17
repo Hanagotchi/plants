@@ -13,7 +13,6 @@ class Plant(Base):
     id_user: Mapped[int] = mapped_column(Integer, nullable=False)
     name: Mapped[str] = mapped_column(String(64), nullable=False)
     scientific_name: Mapped[str] = mapped_column(ForeignKey("dev.plant_type.botanical_name"))
-    logs: Mapped[List["Log"]] = relationship(back_populates="plant")
 
     def __repr__(self) -> str:
         return (
