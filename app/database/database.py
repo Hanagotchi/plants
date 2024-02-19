@@ -1,3 +1,4 @@
+from app.schemas.Log import LogPhotoCreateSchema
 from sqlalchemy import create_engine, select, delete, engine
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
@@ -7,7 +8,7 @@ from app.database.models.base import Base
 from app.database.models.plant_type import PlantType
 from app.database.models.plant import Plant
 
-from typing import List
+from typing import List, Optional
 from datetime import date
 
 load_dotenv()
@@ -93,5 +94,28 @@ class SQLAlchemyClient:
             self, botanical_name_given: str) -> PlantType:
         query = select(PlantType).where(
             PlantType.botanical_name == botanical_name_given)
+        result = self.session.scalars(query).one()
+        return result
+
+
+    def update_log(self,
+                        log_id: str,
+                        title: Optional[str],
+                        content: Optional[str],
+                        plant_id: Optional[int]):
+
+        query = select(Log).where(Log.id == log_id)
+
+        log = self.session.scalars(query).one()
+        if plant_id:
+            log.plant_id = plant_id
+        if content:
+            log.content = content
+        if title:
+            log.title = title
+        self.session.commit()
+        
+    def find_by_log_id(self, log_id: str) -> Log:
+        query = select(Log).where(Log.id == log_id)
         result = self.session.scalars(query).one()
         return result
