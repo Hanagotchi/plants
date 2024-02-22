@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, select, delete, engine
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from os import environ
@@ -101,17 +102,18 @@ class SQLAlchemyClient:
                    title: Optional[str],
                    content: Optional[str],
                    plant_id: Optional[int]):
-
-        query = select(Log).where(Log.id == log_id)
-
-        log = self.session.scalars(query).one()
-        if plant_id:
-            log.plant_id = plant_id
-        if content:
-            log.content = content
+        query = update(Log).where(Log.id == log_id)
         if title:
-            log.title = title
+            query = query.values(title=title)
+        elif content:
+            query = query.values(content=content)
+        elif plant_id:
+            query = query.values(plant_id=plant_id)
+        else:
+            return False
+        self.session.execute(query)
         self.session.commit()
+        return True
 
     def find_by_log_id(self, log_id: str) -> Log:
         query = select(Log).where(Log.id == log_id)

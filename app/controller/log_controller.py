@@ -44,12 +44,17 @@ def update_log(
     log_update_set: LogPartialUpdateSchema
 ):
     try:
-        req.app.database.update_log(
+        result = req.app.database.update_log(
             log_id,
             log_update_set.title,
             log_update_set.content,
             log_update_set.plant_id
         )
+        if not result:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"detail": "No fields to update"}
+            )
         return req.app.database.find_by_log_id(log_id)
     except Exception as err:
         req.app.database.rollback()
