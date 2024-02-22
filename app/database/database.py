@@ -1,13 +1,14 @@
 from sqlalchemy import create_engine, select, delete, engine
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from os import environ
-from app.database.models.Log import Log
+from app.database.models.Log import Log, LogPhoto
 from app.database.models.base import Base
 from app.database.models.plant_type import PlantType
 from app.database.models.plant import Plant
 
-from typing import List
+from typing import List, Optional
 from datetime import date
 
 load_dotenv()
@@ -83,9 +84,9 @@ class SQLAlchemyClient:
                          cleft: date,
                          cright: date) -> List[Log]:
         query = select(Log).\
-                where(Log.created_at.between(cleft, cright)).\
-                where(Log.plant.has(Plant.id_user == user_id)).\
-                order_by(Log.created_at.asc())
+            where(Log.created_at.between(cleft, cright)).\
+            where(Log.plant.has(Plant.id_user == user_id)).\
+            order_by(Log.created_at.asc())
         result = self.session.scalars(query)
         return result
 
@@ -95,3 +96,33 @@ class SQLAlchemyClient:
             PlantType.botanical_name == botanical_name_given)
         result = self.session.scalars(query).one()
         return result
+
+    def update_log(self,
+                   log_id: str,
+                   title: Optional[str],
+                   content: Optional[str],
+                   plant_id: Optional[int]):
+        query = update(Log).where(Log.id == log_id)
+        if title:
+            query = query.values(title=title)
+        elif content:
+            query = query.values(content=content)
+        elif plant_id:
+            query = query.values(plant_id=plant_id)
+        else:
+            return False
+        self.session.execute(query)
+        self.session.commit()
+        return True
+
+    def find_by_log_id(self, log_id: str) -> Log:
+        query = select(Log).where(Log.id == log_id)
+        result = self.session.scalars(query).one()
+        return result
+
+    def delete_photo_from_log(self, id_log: int, id_photo: int) -> int:
+        query = delete(LogPhoto).where(
+            LogPhoto.id == id_photo and LogPhoto.log_id == id_log)
+        result = self.session.execute(query)
+        self.session.commit()
+        return result.rowcount

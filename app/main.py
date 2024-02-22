@@ -1,8 +1,13 @@
-from fastapi import FastAPI, Request, Response, status, Query
+from fastapi import FastAPI, Request, Response, status, Query, Body
 from app.database.database import SQLAlchemyClient
 import logging
 from typing import List, Optional
-from app.schemas.Log import LogCreateSchema, LogSchema
+from app.schemas.Log import (
+    LogCreateSchema,
+    LogPartialUpdateSchema,
+    LogPhotoCreateSchema,
+    LogSchema
+)
 from app.controller import (
     plant_controller,
     plant_types_controller,
@@ -55,11 +60,11 @@ async def shutdown_db_client():
     responses={
         status.HTTP_200_OK: {
             "description": "Return the plant successfully created."
-            },
+        },
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid request body"},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "description": "Internal server error"
-            },
+        },
     },
 )
 async def create_plant(req: Request, item: PlantCreateSchema):
@@ -77,7 +82,7 @@ async def create_plant(req: Request, item: PlantCreateSchema):
         },
         status.HTTP_400_BAD_REQUEST: {
             "description": "Invalid query parameters"
-            },
+        },
         status.HTTP_500_INTERNAL_SERVER_ERROR:
             {"description": "Internal server error"},
     },
@@ -99,13 +104,13 @@ async def get_all_plants(
     responses={
         status.HTTP_200_OK: {
             "description": "Return the plant with the given ID."
-            },
+        },
         status.HTTP_404_NOT_FOUND: {
             "description": "The plant with the given ID was not found"
         },
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "description": "Internal server error"
-            },
+        },
     },
 )
 async def get_one_plant(req: Request, id_plant: str):
@@ -127,7 +132,7 @@ async def get_one_plant(req: Request, id_plant: str):
         },
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "description": "Internal server error"
-            },
+        },
     },
 )
 async def delete_plant(response: Response, req: Request, id_plant: str):
@@ -181,3 +186,38 @@ async def get_logs_by_user(
     month: Optional[int] = Query(None, ge=1, le=12)
 ):
     return log_controller.get_logs_by_user(req, user_id, year, month)
+
+
+@app.patch(
+    "/{id_log}",
+    status_code=status.HTTP_200_OK,
+    response_model=LogSchema
+)
+async def update_fields_in_log(id_log: str,
+                               req: Request,
+                               log_update_set:
+                               LogPartialUpdateSchema = Body(...)):
+    return log_controller.update_log(req, id_log, log_update_set)
+
+
+@app.post(
+    "/{id_log}/photos",
+    status_code=status.HTTP_200_OK,
+    response_model=LogSchema
+)
+async def add_photo(id_log: str,
+                    req: Request,
+                    photo_create_set:
+                    LogPhotoCreateSchema = Body(...)):
+    return log_controller.add_photo(req, id_log, photo_create_set)
+
+
+@app.delete(
+    "/{id_log}/photos/{id_photo}",
+    status_code=status.HTTP_200_OK
+)
+async def delete_photo(req: Request,
+                       response: Response,
+                       id_log: int,
+                       id_photo: int):
+    return log_controller.delete_photo(req, response, id_log, id_photo)
