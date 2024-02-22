@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, select, delete, engine
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from os import environ
-from app.database.models.Log import Log
+from app.database.models.Log import Log, LogPhoto
 from app.database.models.base import Base
 from app.database.models.plant_type import PlantType
 from app.database.models.plant import Plant
@@ -84,9 +84,9 @@ class SQLAlchemyClient:
                          cleft: date,
                          cright: date) -> List[Log]:
         query = select(Log).\
-                where(Log.created_at.between(cleft, cright)).\
-                where(Log.plant.has(Plant.id_user == user_id)).\
-                order_by(Log.created_at.asc())
+            where(Log.created_at.between(cleft, cright)).\
+            where(Log.plant.has(Plant.id_user == user_id)).\
+            order_by(Log.created_at.asc())
         result = self.session.scalars(query)
         return result
 
@@ -97,12 +97,11 @@ class SQLAlchemyClient:
         result = self.session.scalars(query).one()
         return result
 
-
     def update_log(self,
-                        log_id: str,
-                        title: Optional[str],
-                        content: Optional[str],
-                        plant_id: Optional[int]):
+                   log_id: str,
+                   title: Optional[str],
+                   content: Optional[str],
+                   plant_id: Optional[int]):
 
         query = select(Log).where(Log.id == log_id)
 
@@ -114,8 +113,15 @@ class SQLAlchemyClient:
         if title:
             log.title = title
         self.session.commit()
-        
+
     def find_by_log_id(self, log_id: str) -> Log:
         query = select(Log).where(Log.id == log_id)
         result = self.session.scalars(query).one()
         return result
+
+    def delete_photo_from_log(self, id_log: int, id_photo: int) -> int:
+        query = delete(LogPhoto).where(
+            LogPhoto.id == id_photo and LogPhoto.log_id == id_log)
+        result = self.session.execute(query)
+        self.session.commit()
+        return result.rowcount
