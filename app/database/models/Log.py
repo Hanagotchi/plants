@@ -27,6 +27,7 @@ class Log(Base):
     content: Mapped[str] = mapped_column(String(1000))
     photos: Mapped[List["LogPhoto"]] = relationship(back_populates="log")
     plant_id: Mapped[int] = mapped_column(ForeignKey("dev.plants.id"))
+    plant: Mapped["Plant"] = relationship("Plant")
 
     def __repr__(self) -> str:
         return (

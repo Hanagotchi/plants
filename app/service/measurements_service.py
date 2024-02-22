@@ -17,7 +17,9 @@ class MeasurementService:
                 response = await client.delete(MEASUREMENTS_SERVICE_URL + path)
                 return response
         except Exception as e:
-            logger.error("Measurements service cannot be accessed because: " + str(e))
+            logger.error(
+                "Measurements service cannot be accessed because: " + str(e)
+                )
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Measurements service cannot be accessed",
@@ -25,4 +27,6 @@ class MeasurementService:
 
     @staticmethod
     async def delete_device_plant(plant_id: str):
-        return await MeasurementService.delete(f"/device-plant/{plant_id}?type_id=id_plant")
+        return await MeasurementService.delete(
+            f"/device-plant/{plant_id}?type_id=id_plant"
+            )
