@@ -1,4 +1,3 @@
-from app.schemas.Log import LogPhotoCreateSchema
 from sqlalchemy import create_engine, select, delete, engine
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv

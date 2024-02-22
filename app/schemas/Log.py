@@ -90,7 +90,7 @@ class LogPartialUpdateSchema(BaseModel):
     title: Optional[str] = Field(None)
     content: Optional[str] = Field(None)
     plant_id: Optional[int] = Field(None)
-    
+
     class Config:
         json_schema_extra = {
             "example": {

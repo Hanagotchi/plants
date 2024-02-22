@@ -57,7 +57,9 @@ def update_log(
 
 
 @withSQLExceptionsHandle
-def add_photo(req: Request, id_log: str, photo_create_set: LogPhotoCreateSchema) -> Log:
+def add_photo(req: Request,
+              id_log: str,
+              photo_create_set: LogPhotoCreateSchema) -> Log:
     try:
         req.app.database.add(
             LogPhoto(photo_link=photo_create_set.photo_link, log_id=id_log))

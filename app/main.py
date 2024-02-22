@@ -2,7 +2,12 @@ from fastapi import FastAPI, Request, Response, status, Query, Body
 from app.database.database import SQLAlchemyClient
 import logging
 from typing import List, Optional
-from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogPhotoCreateSchema, LogSchema
+from app.schemas.Log import (
+    LogCreateSchema,
+    LogPartialUpdateSchema,
+    LogPhotoCreateSchema,
+    LogSchema
+)
 from app.controller import (
     plant_controller,
     plant_types_controller,
@@ -211,5 +216,8 @@ async def add_photo(id_log: str,
     "/{id_log}/photos/{id_photo}",
     status_code=status.HTTP_200_OK
 )
-async def delete_photo(req: Request, response: Response, id_log: int, id_photo: int):
+async def delete_photo(req: Request,
+                       response: Response,
+                       id_log: int,
+                       id_photo: int):
     return log_controller.delete_photo(req, response, id_log, id_photo)
