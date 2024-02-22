@@ -20,7 +20,7 @@ class PlantType(Base):
                 f"description={self.description}), "
                 f"cares={self.cares}), "
                 f"age={self.photo_link})")
-    
+
     @classmethod
     def from_pydantic(cls, pydantic_obj: PlantTypeSchema):
         return PlantType(
