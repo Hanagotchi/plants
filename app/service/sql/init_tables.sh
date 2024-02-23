@@ -16,7 +16,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "plants" <<-'EOSQL'
     DO $do$
     BEGIN
         IF (SELECT COUNT(*) FROM dev.plant_types) = 0 THEN
-            INSERT INTO dev.plant_types (botanical_name, common_name, description, cares, photo_link)
+            INSERT INTO dev.plant_types (botanical_name, id, common_name, description, cares, photo_link)
             VALUES 
                  (
                 'Streptocarpus',
