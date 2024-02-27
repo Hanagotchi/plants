@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database.models.base import Base
 from app.schemas.plant_type import PlantTypeSchema
@@ -9,6 +9,7 @@ class PlantType(Base):
     __table_args__ = {'schema': 'dev'}
 
     botanical_name: Mapped[str] = mapped_column(String(70), primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, nullable=False)
     common_name: Mapped[str] = mapped_column(String(70))
     description: Mapped[str] = mapped_column(String(600))
     cares: Mapped[str] = mapped_column(String(600))
@@ -16,6 +17,7 @@ class PlantType(Base):
 
     def __repr__(self) -> str:
         return (f"PlantType(botanical_name={self.botanical_name}, "
+                f"id={self.id}, "
                 f"common_name={self.common_name}, "
                 f"description={self.description}), "
                 f"cares={self.cares}), "
@@ -25,6 +27,7 @@ class PlantType(Base):
     def from_pydantic(cls, pydantic_obj: PlantTypeSchema):
         return PlantType(
             botanical_name=pydantic_obj.botanical_name,
+            id=pydantic_obj.id,
             common_name=pydantic_obj.common_name,
             description=pydantic_obj.description,
             cares=pydantic_obj.cares,
