@@ -8,9 +8,9 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "plants" <<-'EOSQL'
         botanical_name VARCHAR(70) PRIMARY KEY,
         id INT UNIQUE NOT NULL,
         common_name VARCHAR(70) NOT NULL,
-        description VARCHAR(600) NOT NULL,
-        cares VARCHAR(600) NOT NULL,
-        photo_link VARCHAR(120) NOT NULL
+        description VARCHAR(1000) NOT NULL,
+        cares VARCHAR(1000) NOT NULL,
+        photo_link VARCHAR(160) NOT NULL
     );
 
     DO $do$
@@ -134,8 +134,7 @@ Requiere una temperatura entre 10 y 35 ℃, que es la adecuada en su entorno de 
                 'Es conocida por sus hojas grandes y espectaculares con perforaciones naturales, que le dan un aspecto único y distintivo. Esta planta trepadora puede alcanzar alturas significativas cuando se cultiva en condiciones adecuadas. Además de su atractivo ornamental, la Monstera deliciosa produce frutos comestibles, aunque tardan varios meses en madurar completamente.',
                 'La Monstera necesita una cantidad media de agua. Es importante evitar regar la planta en exceso, ya que esto puede provocar la pudrición de las raíces. Debe regarla una vez a la semana, aunque puede necesitar un riego adicional cuando hace calor,o cuando la tierra está ligeramente seca. A monstera deliciosa le gusta un entorno húmedo, así que, además de regarla, rocía ligeramente las hojas cada dos días para evitar que la planta se seque.
 Ama los lugares soleados de su hogar. Se recomienda que coloque su monstera en un lugar que reciba mucha luz solar indirecta con un poco de sombra parcial.
-Prosperará en un ambiente cálido con alta humedad. Se puede cultivar en jardines pero generalmente es una planta de interior con temperaturas entre 18-30 °C idealmente. Si la temperatura desciende por debajo de los 15 °C , comenzará a morir.
-',
+Prosperará en un ambiente cálido con alta humedad. Se puede cultivar en jardines pero generalmente es una planta de interior con temperaturas entre 18-30 °C idealmente. Si la temperatura desciende por debajo de los 15 °C , comenzará a morir.',
                 'https://www.picturethisai.com/image-handle/website_cmsname/image/1080/347088479137988608.jpeg?x-oss-process=image/format,webp/resize,s_422&v=1.3'
             ),
             (
@@ -162,8 +161,7 @@ Una ubicación parcialmente sombreada es ideal para el crecimiento de las planta
                 'Cebra',
                 'Es una planta suculenta nativa de Sudáfrica. Se caracteriza por sus rosetas de hojas gruesas y carnosas que forman una forma compacta y esférica. Las hojas son de color verde oscuro y están marcadas con bandas blancas o plateadas a lo largo de los márgenes, lo que le da un aspecto distintivo de rayas.',
                 'La planta cebra disfruta de abundante sol, idealmente una mezcla de exposición total y parcial. Debe regarse moderadamente.
-Es originaria de zonas con temperaturas más cálidas y prefiere temperaturas entre20 y 38 ℃.
-',
+Es originaria de zonas con temperaturas más cálidas y prefiere temperaturas entre20 y 38 ℃.',
                 'https://www.picturethisai.com/image-handle/website_cmsname/image/1080/154206673341251610.jpeg?x-oss-process=image/format,webp/resize,s_422&v=1.3'
             ),
             (
@@ -237,11 +235,11 @@ Su temperatura de crecimiento adecuada es entre 16 a 30 ℃ y la temperatura amb
     END
     $do$;
 
-    CREATE TABLE 
+    CREATE TABLE
         IF NOT EXISTS dev.plants (
-            id SERIAL PRIMARY KEY, 
+            id SERIAL PRIMARY KEY,
             id_user INT NOT NULL,
-            name VARCHAR(64) NOT NULL, 
+            name VARCHAR(64) NOT NULL,
             scientific_name VARCHAR(70) NOT NULL,
             CONSTRAINT fk_plant_type
                 FOREIGN KEY (scientific_name)
@@ -251,10 +249,10 @@ Su temperatura de crecimiento adecuada es entre 16 a 30 ℃ y la temperatura amb
 
     DO $do$ BEGIN
         IF (SELECT COUNT(*) FROM dev.plants) = 0 THEN
-            INSERT INTO dev.plants (id_user, name, scientific_name) VALUES 
-                (1, 'Rosa', 'Streptocarpus'),
-                (2, 'Margarita', 'Pilea microphylla'),
-                (3, 'Girasol', 'Pentas lanceolata');
+            INSERT INTO dev.plants (id_user, name, scientific_name) VALUES
+                (1, 'Lengua', 'Sansevieria trifasciata'),
+                (2, 'Rosa', 'Rosa chinensis'),
+                (3, 'Flor', 'Passiflora caerulea');
         END IF;
     END $do$;
 
