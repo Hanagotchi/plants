@@ -3,6 +3,7 @@ from re import L
 from fastapi import Response, status, HTTPException
 from typing import List, Optional, Sequence
 from pydantic import BaseModel
+from app.exceptions.row_not_found import RowNotFoundError
 
 from app.models import plant_type
 
@@ -105,12 +106,7 @@ class PlantsService():
     def delete_photo(self, id_log: int, id_photo: int):
         result_rowcount = self.plants_repository.delete_photo_from_log(id_log, id_photo)
         if result_rowcount == 0:
-            raise Exception("")
-        
-        """ return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"deleted": "Photo deleted successfully"},
-        ) """
+            raise RowNotFoundError(f"Could not found photo with id {id_photo} in log with id {id_log}")
 
 
     @withSQLExceptionsHandle

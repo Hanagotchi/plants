@@ -1,4 +1,5 @@
 from typing import Optional, List
+from app.exceptions.row_not_found import RowNotFoundError
 from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogPhotoCreateSchema, LogSchema
 from app.schemas.plant import PlantCreateSchema, PlantSchema
 from app.schemas.plant_type import PlantTypeSchema
@@ -6,6 +7,8 @@ from app.service.Plants import PlantsService
 from fastapi import HTTPException, status, Response
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+
+
 
 class PlantController:
 
@@ -58,11 +61,17 @@ class PlantController:
         )
     
     def handle_delete_photo(self, id_log: int, id_photo: int) -> JSONResponse:
-        self.plants_service.delete_photo(id_log, id_photo)
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content="Photo deleted successfully"
-        )
+        try:
+            self.plants_service.delete_photo(id_log, id_photo)
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content="Photo deleted successfully"
+            )
+        except RowNotFoundError as err:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content=jsonable_encoder(err.detail)
+            )
     
     def handle_get_plant_type(self, botanical_name: str) -> JSONResponse:
         plant_type: PlantTypeSchema = self.plants_service.get_plant_type(botanical_name)

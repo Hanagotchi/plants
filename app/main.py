@@ -68,7 +68,7 @@ async def create_plant(item: PlantCreateSchema):
     return plants_controller.handle_create_plant(item)
 
 
-@app.get("/plants", tags=["Plants"],)
+@app.get("/plants", tags=["Plants"])
 async def get_all_plants(id_user: int = Query(None), limit: int = Query(1024)):
     if id_user is not None:
         return plants_controller.handle_get_plants_by_user(id_user, limit)
