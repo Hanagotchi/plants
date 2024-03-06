@@ -117,7 +117,7 @@ class PlantsService():
 
 
     @withSQLExceptionsHandle
-    def get_all_plant_types(self, limit: int) -> List[PlantTypeSchema]:
+    def get_all_plant_types(self, limit: Optional[int]) -> List[PlantTypeSchema]:
         plant_types = self.plants_repository.get_all_plant_types(limit)
         return list(map(
             lambda pt: PlantTypeSchema.model_validate(pt.__dict__), 

@@ -71,7 +71,7 @@ class PlantController:
             content=jsonable_encoder(plant_type)
         )
     
-    def handle_get_all_plant_types(self, limit: int) -> JSONResponse:
+    def handle_get_all_plant_types(self, limit: Optional[int]) -> JSONResponse:
         plant_type_list: List[PlantTypeSchema] = self.plants_service.get_all_plant_types(limit)
         return JSONResponse(
             status_code=status.HTTP_200_OK,

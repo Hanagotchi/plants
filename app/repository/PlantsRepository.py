@@ -36,7 +36,7 @@ class PlantsRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_plant_types(self, limit: int) -> Sequence[PlantType]:
+    def get_all_plant_types(self, limit: Optional[int]) -> Sequence[PlantType]:
         pass
 
     @abstractmethod

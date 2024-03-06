@@ -76,8 +76,9 @@ class PlantsDB(PlantsRepository):
         self.session.add(record)
         self.session.commit()
 
-    def get_all_plant_types(self, limit: int) -> Sequence[PlantType]:
-        query = select(PlantType).limit(limit)
+    def get_all_plant_types(self, limit: Optional[int]) -> Sequence[PlantType]:
+        query = select(PlantType)
+        if limit: query = query.limit(limit)
         result = self.session.scalars(query).all()
         return result
 
