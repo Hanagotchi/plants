@@ -2,8 +2,9 @@ from typing import Optional, List
 from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogPhotoCreateSchema
 from app.schemas.plant import PlantCreateSchema, PlantSchema
 from app.service.Plants import PlantsService
-from fastapi import HTTPException, Response, status
-import json
+from fastapi import HTTPException, status, Response
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 
 class PlantController:
 
@@ -50,21 +51,30 @@ class PlantController:
         plant_type_list = self.plants_service.get_all_plant_types(limit)
         return Response(status_code=status.HTTP_200_OK, content=plant_type_list)
     
-    def handle_create_plant(self, data: PlantCreateSchema) -> Response:
-        plant = self.plants_service.create_plant(data)
-        return Response(status_code=status.HTTP_201_CREATED, content=plant)
+    def handle_create_plant(self, data: PlantCreateSchema) -> PlantSchema:
+        return self.plants_service.create_plant(data)
 
-    def handle_get_plant(self, id_received: int) -> Response:
+    def handle_get_plant(self, id_received: int) -> JSONResponse:
         plant = self.plants_service.get_plant(id_received)
-        return Response(status_code=status.HTTP_200_OK, content=plant)
-    
-    def handle_get_all_plants(self, limit: int) -> List[PlantSchema]:
-        return self.plants_service.get_all_plants(limit)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=jsonable_encoder(plant)
+        )
 
     
-    def handle_get_plants_by_user(self, id_user: int, limit: int) -> List[PlantSchema]:
+    def handle_get_all_plants(self, limit: int) -> JSONResponse:
+        plant_list = self.plants_service.get_all_plants(limit)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=jsonable_encoder(plant_list)
+        )
+
+    def handle_get_plants_by_user(self, id_user: int, limit: int) -> JSONResponse:
         user_plant_list = self.plants_service.get_plants_by_user(id_user, limit)
-        return self.plants_service.get_plants_by_user(id_user, limit)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=jsonable_encoder(user_plant_list)
+        )
     
     async def handle_delete_device_plant_association(
         self, response: Response, id_plant: int, result_plant: int

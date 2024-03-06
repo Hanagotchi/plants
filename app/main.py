@@ -54,7 +54,6 @@ async def shutdown_db_client():
 @app.post(
     "/plants",
     status_code=status.HTTP_201_CREATED,
-    response_model=PlantSchema,
     tags=["Plants"],
     responses={
         status.HTTP_200_OK: {
@@ -70,14 +69,8 @@ async def create_plant(item: PlantCreateSchema):
     return plants_controller.handle_create_plant(item)
 
 
-@app.get(
-    "/plants",
-    status_code=status.HTTP_200_OK,
-    response_model=List[PlantSchema],
-)
-async def get_all_plants(
-    id_user: int = Query(None), limit: int = Query(1024)
-):
+@app.get("/plants", status_code=status.HTTP_200_OK)
+async def get_all_plants(id_user: int = Query(None), limit: int = Query(1024)):
     if id_user is not None:
         return plants_controller.handle_get_plants_by_user(id_user, limit)
 
@@ -87,7 +80,6 @@ async def get_all_plants(
 @app.get(
     "/plants/{id_plant}",
     status_code=status.HTTP_200_OK,
-    response_model=PlantSchema,
     tags=["Plants"],
     responses={
         status.HTTP_200_OK: {

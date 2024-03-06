@@ -2,15 +2,22 @@ from datetime import date, timedelta
 from re import L
 from fastapi import Response, status, HTTPException
 from typing import List, Optional
+from pydantic import BaseModel
+
+from sqlalchemy import ScalarResult
+from app.models import plant_type
 
 from app.models.Log import Log, LogPhoto
+from app.models.base import Base
 from app.models.plant import Plant
 from app.models.plant_type import PlantType
 from app.repository.PlantsRepository import PlantsRepository
-from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogPhotoCreateSchema
+from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogPhotoCreateSchema, LogSchema
 from app.schemas.plant import PlantCreateSchema, PlantSchema
+from app.schemas.plant_type import PlantTypeSchema
 from app.service.Measurements import MeasurementService
 from app.utils.sql_exception_handling import withSQLExceptionsHandle
+
 
 class PlantsService():
 
@@ -18,11 +25,11 @@ class PlantsService():
         self.plants_repository = plants_repository
 
     @withSQLExceptionsHandle
-    def create_log(self, input_log: LogCreateSchema) -> Log:
+    def create_log(self, input_log: LogCreateSchema) -> LogSchema:
         try:
             log: Log = Log.from_pydantic(input_log)
             self.plants_repository.add(log)
-            return log
+            return LogSchema.model_validate(log.__dict__)
         except Exception as err:
             self.plants_repository.rollback()
             raise err
@@ -32,7 +39,7 @@ class PlantsService():
     def get_logs_by_user(self, 
                         user_id: int,
                         year: int,
-                        month: Optional[int]) -> List[Log]:
+                        month: Optional[int]) -> List[LogSchema]:
         if month:
             left = date(year, month, 1)
             right = left + timedelta(weeks=4)
@@ -40,7 +47,11 @@ class PlantsService():
             left = date(year, 1, 1)
             right = date(year+1, 1, 1)
 
-        return self.plants_repository.get_logs_between(user_id, left, right)
+        logs: ScalarResult[Log] = self.plants_repository.get_logs_between(user_id, left, right)
+        return list(map(
+            lambda log: LogSchema.model_validate(log.__dict__), 
+            logs
+        ))
 
 
     @withSQLExceptionsHandle
@@ -48,7 +59,7 @@ class PlantsService():
         self,
         log_id: str,
         log_update_set: LogPartialUpdateSchema
-    ) -> Optional[Log]:
+    ) -> Optional[LogSchema]:
         try:
             result = self.plants_repository.update_log(
                 log_id,
@@ -58,7 +69,7 @@ class PlantsService():
             )
             if not result:
                 return None
-            return self.plants_repository.find_by_log_id(log_id)
+            return LogSchema.model_validate(self.plants_repository.find_by_log_id(log_id).__dict__)
         except Exception as err:
             self.plants_repository.rollback()
             raise err
@@ -67,11 +78,11 @@ class PlantsService():
     @withSQLExceptionsHandle
     def add_photo(self,
                 id_log: str,
-                photo_create_set: LogPhotoCreateSchema) -> Log:
+                photo_create_set: LogPhotoCreateSchema) -> LogSchema:
         try:
             self.plants_repository.add(LogPhoto(photo_link=photo_create_set.photo_link, log_id=id_log))
             log = self.plants_repository.find_by_log_id(id_log)
-            return log
+            return LogSchema.model_validate(log.__dict__)
         except Exception as err:
             self.plants_repository.rollback()
             raise err
@@ -90,20 +101,27 @@ class PlantsService():
 
 
     @withSQLExceptionsHandle
-    def get_plant_type(self, botanical_name: str) -> PlantType:
-        return self.plants_repository.get_plant_type_by_botanical_name(botanical_name)
+    def get_plant_type(self, botanical_name: str) -> PlantTypeSchema:
+        plant_type = self.plants_repository.get_plant_type_by_botanical_name(botanical_name)
+        return PlantTypeSchema.model_validate(plant_type.__dict__)
 
 
     @withSQLExceptionsHandle
-    def get_all_plant_types(self, limit: int) -> List[PlantType]:
-        return self.plants_repository.get_all_plant_types(limit)
+    def get_all_plant_types(self, limit: int) -> List[PlantTypeSchema]:
+        plant_types = self.plants_repository.get_all_plant_types(limit)
+        return list(map(
+            lambda pt: PlantTypeSchema.model_validate(pt.__dict__), 
+            plant_types
+        ))
     
+
     @withSQLExceptionsHandle
-    def create_plant(self, data: PlantCreateSchema) -> Plant:
+    def create_plant(self, data: PlantCreateSchema) -> PlantSchema:
         try:
-            plant: Plant = Plant.from_pydantic(data)
+            plant = Plant.from_pydantic(data)
             self.plants_repository.add(plant)
-            return self.plants_repository.get_plant_by_id(plant.id)
+            created_plant: Plant = self.plants_repository.get_plant_by_id(plant.id)
+            return PlantSchema.model_validate(created_plant.__dict__)
         except Exception as err:
             self.plants_repository.rollback()
             raise err
@@ -111,7 +129,9 @@ class PlantsService():
 
     @withSQLExceptionsHandle
     def get_plant(self, id_received: int) -> PlantSchema:
-        return PlantSchema.model_validate(self.plants_repository.get_plant_by_id(id_received))
+        return PlantSchema.model_validate(
+            self.plants_repository.get_plant_by_id(id_received).__dict__
+        )
 
 
     @withSQLExceptionsHandle
