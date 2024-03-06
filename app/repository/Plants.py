@@ -23,7 +23,7 @@ class PlantsDB(PlantsRepository):
         username=environ["POSTGRES_USER"],
         password=environ["POSTGRES_PASSWORD"],
         host=environ["POSTGRES_HOST"],
-        port=environ["POSTGRES_PORT"],
+        port=int(environ["POSTGRES_PORT"]),
     )
 
     engine = create_engine(db_url)
@@ -132,7 +132,8 @@ class PlantsDB(PlantsRepository):
 
     def delete_photo_from_log(self, id_log: int, id_photo: int) -> int:
         query = delete(LogPhoto).where(
-            LogPhoto.id == id_photo and LogPhoto.log_id == id_log)
+            LogPhoto.id == id_photo, LogPhoto.log_id == id_log
+        )
         result = self.session.execute(query)
         self.session.commit()
         return result.rowcount
