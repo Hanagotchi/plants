@@ -12,6 +12,9 @@ services:
     volumes:
       - ./app:/app/app
     tty: true
+    depends_on:
+      sql:
+        condition: service_healthy
 
   sql:
     build:
