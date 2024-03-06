@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import Optional
+from typing import Optional, Sequence
 
 from sqlalchemy import ScalarResult
 from app.models.Log import Log
@@ -20,7 +20,7 @@ class PlantsRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_plants(self, limit: int) -> ScalarResult[Plant]:
+    def get_all_plants(self, limit: int) -> Sequence[Plant]:
         pass
 
     @abstractmethod
@@ -28,7 +28,7 @@ class PlantsRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_plants_by_user(self, id_user: int, limit: int) -> ScalarResult[Plant]:
+    def get_all_plants_by_user(self, id_user: int, limit: int) -> Sequence[Plant]:
         pass
 
     @abstractmethod
@@ -36,14 +36,14 @@ class PlantsRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_plant_types(self, limit: int) -> ScalarResult[PlantType]:
+    def get_all_plant_types(self, limit: int) -> Sequence[PlantType]:
         pass
 
     @abstractmethod
     def get_logs_between(self,
                          user_id: int,
                          cleft: date,
-                         cright: date) -> ScalarResult[Log]:
+                         cright: date) -> Sequence[Log]:
         pass
 
     @abstractmethod

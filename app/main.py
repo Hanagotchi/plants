@@ -53,7 +53,6 @@ async def shutdown_db_client():
 
 @app.post(
     "/plants",
-    status_code=status.HTTP_201_CREATED,
     tags=["Plants"],
     responses={
         status.HTTP_200_OK: {
@@ -69,7 +68,7 @@ async def create_plant(item: PlantCreateSchema):
     return plants_controller.handle_create_plant(item)
 
 
-@app.get("/plants", status_code=status.HTTP_200_OK)
+@app.get("/plants", tags=["Plants"],)
 async def get_all_plants(id_user: int = Query(None), limit: int = Query(1024)):
     if id_user is not None:
         return plants_controller.handle_get_plants_by_user(id_user, limit)
@@ -79,7 +78,6 @@ async def get_all_plants(id_user: int = Query(None), limit: int = Query(1024)):
 
 @app.get(
     "/plants/{id_plant}",
-    status_code=status.HTTP_200_OK,
     tags=["Plants"],
     responses={
         status.HTTP_200_OK: {
@@ -99,7 +97,6 @@ async def get_one_plant(req: Request, id_plant: int):
 
 @app.delete(
     "/plants/{id_plant}",
-    status_code=status.HTTP_200_OK,
     tags=["Plants"],
     responses={
         status.HTTP_200_OK: {
@@ -122,8 +119,6 @@ async def delete_plant(response: Response, id_plant: int):
 @app.get(
     "/plant-type",
     tags=["Plant types"],
-    status_code=status.HTTP_200_OK,
-    response_model=List[PlantTypeSchema]
 )
 async def get_all_plant_types(req: Request, limit: Optional[int] = None):
     return plants_controller.handle_get_all_plant_types(limit)
@@ -132,8 +127,6 @@ async def get_all_plant_types(req: Request, limit: Optional[int] = None):
 @app.get(
     "/plant-type/{botanical_name}",
     tags=["Plant types"],
-    status_code=status.HTTP_200_OK,
-    response_model=PlantTypeSchema
 )
 async def get_plant_type(
     botanical_name: str,
@@ -143,9 +136,7 @@ async def get_plant_type(
 
 @app.post(
     "/logs",
-    status_code=status.HTTP_201_CREATED,
     tags=["Logs"],
-    response_model=LogSchema
 )
 async def create_log(
     item: LogCreateSchema
@@ -155,8 +146,6 @@ async def create_log(
 
 @app.get(
     "/logs/{user_id}",
-    status_code=status.HTTP_200_OK,
-    response_model=List[LogSchema]
 )
 async def get_logs_by_user(
     user_id: int,
@@ -168,8 +157,6 @@ async def get_logs_by_user(
 
 @app.patch(
     "/{id_log}",
-    status_code=status.HTTP_200_OK,
-    response_model=LogSchema
 )
 async def update_fields_in_log(id_log: str,
                                log_update_set:
@@ -179,8 +166,6 @@ async def update_fields_in_log(id_log: str,
 
 @app.post(
     "/{id_log}/photos",
-    status_code=status.HTTP_200_OK,
-    response_model=LogSchema
 )
 async def add_photo(id_log: str,
                     photo_create_set:
@@ -190,7 +175,6 @@ async def add_photo(id_log: str,
 
 @app.delete(
     "/{id_log}/photos/{id_photo}",
-    status_code=status.HTTP_200_OK
 )
 async def delete_photo(id_log: int,
                        id_photo: int):

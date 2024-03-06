@@ -1,4 +1,4 @@
-from sqlalchemy import ScalarResult, create_engine, select, delete, engine
+from sqlalchemy import create_engine, select, delete, engine
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
@@ -8,7 +8,7 @@ from app.models.base import Base
 from app.models.plant_type import PlantType
 from app.models.plant import Plant
 
-from typing import List, Optional
+from typing import List, Optional, Sequence
 from datetime import date
 
 from app.repository.PlantsRepository import PlantsRepository
@@ -49,9 +49,9 @@ class PlantsDB(PlantsRepository):
         result = self.session.scalars(query).one()
         return result
 
-    def get_all_plants(self, limit: int) -> ScalarResult[Plant]:
+    def get_all_plants(self, limit: int) -> Sequence[Plant]:
         query = select(Plant).limit(limit)
-        result = self.session.scalars(query)
+        result = self.session.scalars(query).all()
         return result
 
     def delete_plant(self, id_received: int) -> int:
@@ -67,29 +67,34 @@ class PlantsDB(PlantsRepository):
         self.session.commit()
         return result.rowcount
 
-    def get_all_plants_by_user(self, id_user: int, limit: int) -> ScalarResult[Plant]:
+    def get_all_plants_by_user(self, id_user: int, limit: int) -> Sequence[Plant]:
         query = select(Plant).where(Plant.id_user == id_user).limit(limit)
-        result = self.session.scalars(query)
+        result = self.session.scalars(query).all()
         return result
 
     def add(self, record: Base):
         self.session.add(record)
         self.session.commit()
 
-    def get_all_plant_types(self, limit: int) -> ScalarResult[PlantType]:
+    def get_all_plant_types(self, limit: int) -> Sequence[PlantType]:
         query = select(PlantType).limit(limit)
-        result = self.session.scalars(query)
+        result = self.session.scalars(query).all()
+        return result
+
+    def get_log(self, log_id: int) -> Log:
+        query = select(Log).where(Log.id == log_id)
+        result = self.session.scalars(query).one()
         return result
 
     def get_logs_between(self,
                          user_id: int,
                          cleft: date,
-                         cright: date) -> ScalarResult[Log]:
+                         cright: date) -> Sequence[Log]:
         query = select(Log).\
             where(Log.created_at.between(cleft, cright)).\
             where(Log.plant.has(Plant.id_user == user_id)).\
             order_by(Log.created_at.asc())
-        result = self.session.scalars(query)
+        result = self.session.scalars(query).all()
         return result
 
     def get_plant_type_by_botanical_name(

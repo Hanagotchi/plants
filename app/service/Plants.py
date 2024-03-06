@@ -1,10 +1,9 @@
 from datetime import date, timedelta
 from re import L
 from fastapi import Response, status, HTTPException
-from typing import List, Optional
+from typing import List, Optional, Sequence
 from pydantic import BaseModel
 
-from sqlalchemy import ScalarResult
 from app.models import plant_type
 
 from app.models.Log import Log, LogPhoto
@@ -27,9 +26,10 @@ class PlantsService():
     @withSQLExceptionsHandle
     def create_log(self, input_log: LogCreateSchema) -> LogSchema:
         try:
-            log: Log = Log.from_pydantic(input_log)
+            log = Log.from_pydantic(input_log)
             self.plants_repository.add(log)
-            return LogSchema.model_validate(log.__dict__)
+            created_log: Log = self.plants_repository.get_log(log.id)
+            return LogSchema.model_validate(created_log.__dict__)
         except Exception as err:
             self.plants_repository.rollback()
             raise err
@@ -47,7 +47,10 @@ class PlantsService():
             left = date(year, 1, 1)
             right = date(year+1, 1, 1)
 
-        logs: ScalarResult[Log] = self.plants_repository.get_logs_between(user_id, left, right)
+        logs: Sequence[Log] = self.plants_repository.get_logs_between(user_id, left, right)
+        #TODO: Este print hace que los logs se parsen bien a LogSchemas. No quitar a
+        #a menos que se encuentre una mejor solucion.
+        print(logs)
         return list(map(
             lambda log: LogSchema.model_validate(log.__dict__), 
             logs
@@ -69,7 +72,11 @@ class PlantsService():
             )
             if not result:
                 return None
-            return LogSchema.model_validate(self.plants_repository.find_by_log_id(log_id).__dict__)
+            log = self.plants_repository.find_by_log_id(log_id)
+            #TODO: Este print hace que los logs se parsen bien a LogSchemas. No quitar a
+            #a menos que se encuentre una mejor solucion.
+            print(log)           
+            return LogSchema.model_validate(log.__dict__)
         except Exception as err:
             self.plants_repository.rollback()
             raise err
@@ -82,6 +89,9 @@ class PlantsService():
         try:
             self.plants_repository.add(LogPhoto(photo_link=photo_create_set.photo_link, log_id=id_log))
             log = self.plants_repository.find_by_log_id(id_log)
+            #TODO: Este print hace que los logs se parsen bien a LogSchemas. No quitar a
+            #a menos que se encuentre una mejor solucion.
+            print(log)
             return LogSchema.model_validate(log.__dict__)
         except Exception as err:
             self.plants_repository.rollback()
