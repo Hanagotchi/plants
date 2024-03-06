@@ -1,6 +1,6 @@
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-from app.database.models.base import Base
+from app.models.base import Base
 from app.schemas.plant import PlantCreateSchema
 
 
@@ -19,7 +19,7 @@ class Plant(Base):
 
     def __repr__(self) -> str:
         return (
-            f"Example(id={self.id!r}, id_user={self.id_user!r}, "
+            f"Plant(id={self.id!r}, id_user={self.id_user!r}, "
             f"name={self.name!r}, scientific_name={self.scientific_name!r})"
         )
 

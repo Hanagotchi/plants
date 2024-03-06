@@ -1,22 +1,19 @@
 from fastapi import FastAPI, Request, Response, status, Query, Body
-from app.database.database import SQLAlchemyClient
+from app.controller.Plants import PlantController
 import logging
 from typing import List, Optional
+from app.repository.Plants import PlantsDB
 from app.schemas.Log import (
     LogCreateSchema,
     LogPartialUpdateSchema,
     LogPhotoCreateSchema,
     LogSchema
 )
-from app.controller import (
-    plant_controller,
-    plant_types_controller,
-    log_controller
-)
 from app.schemas.plant import (
     PlantSchema, PlantCreateSchema
 )
 from app.schemas.plant_type import PlantTypeSchema
+from app.service.Plants import PlantsService
 
 tags_metadata = [
     {"name": "Plants", "description": "Operations with plants."},
@@ -29,6 +26,9 @@ app = FastAPI(
     summary="Microservice for plants management",
 )
 
+plants_repository = PlantsDB()
+plants_service = PlantsService(plants_repository)
+plants_controller = PlantController(plants_service)
 
 logger = logging.getLogger("plants")
 logger.setLevel("DEBUG")
@@ -39,7 +39,6 @@ async def start_up():
     app.logger = logger
 
     try:
-        app.database = SQLAlchemyClient()
         app.logger.info("Postgres connection established")
     except Exception as e:
         app.logger.error(e)
@@ -48,7 +47,7 @@ async def start_up():
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    app.database.shutdown()
+    plants_repository.shutdown()
     app.logger.info("Postgres shutdown succesfully")
 
 
@@ -67,33 +66,22 @@ async def shutdown_db_client():
         },
     },
 )
-async def create_plant(req: Request, item: PlantCreateSchema):
-    return plant_controller.create_plant(req, item)
+async def create_plant(item: PlantCreateSchema):
+    return plants_controller.handle_create_plant(item)
 
 
 @app.get(
     "/plants",
     status_code=status.HTTP_200_OK,
     response_model=List[PlantSchema],
-    tags=["Plants"],
-    responses={
-        status.HTTP_200_OK: {
-            "description": "Return all plants or the plants of the given user."
-        },
-        status.HTTP_400_BAD_REQUEST: {
-            "description": "Invalid query parameters"
-        },
-        status.HTTP_500_INTERNAL_SERVER_ERROR:
-            {"description": "Internal server error"},
-    },
 )
 async def get_all_plants(
-    req: Request, id_user: int = Query(None), limit: int = Query(1024)
+    id_user: int = Query(None), limit: int = Query(1024)
 ):
     if id_user is not None:
-        return plant_controller.get_plants_by_user(req, id_user, limit)
+        return plants_controller.handle_get_plants_by_user(id_user, limit)
 
-    return plant_controller.get_all_plants(req, limit)
+    return plants_controller.handle_get_all_plants(limit)
 
 
 @app.get(
@@ -113,8 +101,8 @@ async def get_all_plants(
         },
     },
 )
-async def get_one_plant(req: Request, id_plant: str):
-    return plant_controller.get_plant(req, id_plant)
+async def get_one_plant(req: Request, id_plant: int):
+    return plants_controller.handle_get_plant(id_plant)
 
 
 @app.delete(
@@ -135,8 +123,8 @@ async def get_one_plant(req: Request, id_plant: str):
         },
     },
 )
-async def delete_plant(response: Response, req: Request, id_plant: str):
-    return await plant_controller.delete_plant(response, req, id_plant)
+async def delete_plant(response: Response, id_plant: int):
+    return await plants_controller.handle_delete_plant(response, id_plant)
 
 
 @app.get(
@@ -146,7 +134,7 @@ async def delete_plant(response: Response, req: Request, id_plant: str):
     response_model=List[PlantTypeSchema]
 )
 async def get_all_plant_types(req: Request, limit: Optional[int] = None):
-    return plant_types_controller.get_all_plant_types(req, limit)
+    return plants_controller.handle_get_all_plant_types(limit)
 
 
 @app.get(
@@ -157,9 +145,8 @@ async def get_all_plant_types(req: Request, limit: Optional[int] = None):
 )
 async def get_plant_type(
     botanical_name: str,
-    req: Request,
 ):
-    return plant_types_controller.get_plant_type(req, botanical_name)
+    return plants_controller.handle_get_plant_type(botanical_name)
 
 
 @app.post(
@@ -169,9 +156,9 @@ async def get_plant_type(
     response_model=LogSchema
 )
 async def create_log(
-    req: Request, item: LogCreateSchema
+    item: LogCreateSchema
 ):
-    return log_controller.create_log(req, item)
+    return plants_controller.handle_create_log(item)
 
 
 @app.get(
@@ -180,12 +167,11 @@ async def create_log(
     response_model=List[LogSchema]
 )
 async def get_logs_by_user(
-    req: Request,
     user_id: int,
     year: int = Query(..., gt=0),
     month: Optional[int] = Query(None, ge=1, le=12)
 ):
-    return log_controller.get_logs_by_user(req, user_id, year, month)
+    return plants_controller.handle_get_logs_by_user(user_id, year, month)
 
 
 @app.patch(
@@ -194,10 +180,9 @@ async def get_logs_by_user(
     response_model=LogSchema
 )
 async def update_fields_in_log(id_log: str,
-                               req: Request,
                                log_update_set:
                                LogPartialUpdateSchema = Body(...)):
-    return log_controller.update_log(req, id_log, log_update_set)
+    return plants_controller.handle_update_log(id_log, log_update_set)
 
 
 @app.post(
@@ -206,18 +191,15 @@ async def update_fields_in_log(id_log: str,
     response_model=LogSchema
 )
 async def add_photo(id_log: str,
-                    req: Request,
                     photo_create_set:
                     LogPhotoCreateSchema = Body(...)):
-    return log_controller.add_photo(req, id_log, photo_create_set)
+    return plants_controller.handle_add_photo(id_log, photo_create_set)
 
 
 @app.delete(
     "/{id_log}/photos/{id_photo}",
     status_code=status.HTTP_200_OK
 )
-async def delete_photo(req: Request,
-                       response: Response,
-                       id_log: int,
+async def delete_photo(id_log: int,
                        id_photo: int):
-    return log_controller.delete_photo(req, response, id_log, id_photo)
+    return plants_controller.handle_delete_photo(id_log, id_photo)

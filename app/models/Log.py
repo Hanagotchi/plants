@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from sqlalchemy import ForeignKey, Integer, String, TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.database.models.base import Base
+from app.models.base import Base
 from datetime import datetime
 from typing import List
-from app.database.models.plant import Plant
+from app.models.plant import Plant
 
 from app.schemas.Log import LogCreateSchema
 

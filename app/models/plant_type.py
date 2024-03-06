@@ -1,6 +1,6 @@
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column
-from app.database.models.base import Base
+from app.models.base import Base
 from app.schemas.plant_type import PlantTypeSchema
 
 
