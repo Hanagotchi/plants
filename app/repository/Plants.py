@@ -110,17 +110,17 @@ class PlantsDB(PlantsRepository):
                    content: Optional[str],
                    plant_id: Optional[int]) -> bool:
         query = update(Log).where(Log.id == log_id)
+
+        if not title and not content and not plant_id:
+            return False
         
-        #TODO: Solo se esta teniendo en cuenta uno de los campos.
-        # Se deben agregar todos aquellos que tengan contenido.
         if title:
             query = query.values(title=title)
-        elif content:
+        if content:
             query = query.values(content=content)
-        elif plant_id:
+        if plant_id:
             query = query.values(plant_id=plant_id)
-        else:
-            return False
+
         self.session.execute(query)
         self.session.commit()
         return True
