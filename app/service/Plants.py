@@ -29,6 +29,9 @@ class PlantsService():
             log = Log.from_pydantic(input_log)
             self.plants_repository.add(log)
             created_log: Log = self.plants_repository.get_log(log.id)
+            #TODO: Este print hace que los logs se parsen bien a LogSchemas. No quitar a
+            #a menos que se encuentre una mejor solucion.
+            print(created_log)
             return LogSchema.model_validate(created_log.__dict__)
         except Exception as err:
             self.plants_repository.rollback()

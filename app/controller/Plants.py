@@ -53,7 +53,7 @@ class PlantController:
                 photo_create_set: LogPhotoCreateSchema) -> JSONResponse:
         log: LogSchema = self.plants_service.add_photo(id_log, photo_create_set)
         return JSONResponse(
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             content=jsonable_encoder(log)
         )
     
@@ -81,7 +81,7 @@ class PlantController:
     def handle_create_plant(self, data: PlantCreateSchema) -> JSONResponse:
         plant: PlantSchema = self.plants_service.create_plant(data)
         return JSONResponse(
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             content=jsonable_encoder(plant)
         )
 
