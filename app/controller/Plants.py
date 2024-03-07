@@ -141,7 +141,7 @@ class PlantController:
         result: str = await self.plants_service\
             .delete_device_plant_association(response, id_plant, result_plant)
         return JSONResponse(
-            status_code=status.HTTP_200_OK, 
+            status_code=status.HTTP_200_OK,
             content=result
         )
 
