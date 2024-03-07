@@ -52,18 +52,20 @@ class PlantsDB(PlantsRepository):
     def get_all_plants(self, limit: int) -> Sequence[Plant]:
         query = select(Plant).limit(limit)
         result = self.session.scalars(query).all()
+        print(result)
         return result
 
     def delete_plant(self, id_received: int) -> int:
         """
-        Delete a plant by id
+        Delete a plant by id and its logs
         Args:
             id_received (str): id of the plant to delete
         Returns:
             int: number of rows affected. 0 if no rows were affected
         """
-        query = delete(Plant).where(Plant.id == id_received)
-        result = self.session.execute(query)
+        
+        delete_plant = delete(Plant).where(Plant.id == id_received)
+        result = self.session.execute(delete_plant)
         self.session.commit()
         return result.rowcount
 

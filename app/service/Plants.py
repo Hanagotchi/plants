@@ -1,8 +1,10 @@
 from datetime import date, timedelta
+import logging
 from re import L
 from fastapi import Response, status, HTTPException
 from typing import List, Optional, Sequence
 from pydantic import BaseModel
+from app.exceptions.internal_service_access import InternalServiceAccessError
 from app.exceptions.row_not_found import RowNotFoundError
 
 from app.models import plant_type
@@ -17,7 +19,10 @@ from app.schemas.plant import PlantCreateSchema, PlantSchema
 from app.schemas.plant_type import PlantTypeSchema
 from app.service.Measurements import MeasurementService
 from app.utils.sql_exception_handling import withSQLExceptionsHandle
+from sqlalchemy.exc import SQLAlchemyError
 
+logger = logging.getLogger("app")
+logger.setLevel("DEBUG")
 
 class PlantsService():
 
@@ -104,9 +109,13 @@ class PlantsService():
 
     @withSQLExceptionsHandle
     def delete_photo(self, id_log: int, id_photo: int):
-        result_rowcount = self.plants_repository.delete_photo_from_log(id_log, id_photo)
-        if result_rowcount == 0:
-            raise RowNotFoundError(f"Could not found photo with id {id_photo} in log with id {id_log}")
+        try:
+            result_rowcount = self.plants_repository.delete_photo_from_log(id_log, id_photo)
+            if result_rowcount == 0:
+                raise RowNotFoundError(f"Could not found photo with id {id_photo} in log with id {id_log}")
+        except SQLAlchemyError as err:
+            self.plants_repository.rollback()
+            raise err
 
 
     @withSQLExceptionsHandle
@@ -160,7 +169,7 @@ class PlantsService():
 
 
     #@withSQLExceptionsHandle
-    async def delete_device_plant_association(
+    async def _delete_device_plant_association(
         self, response: Response, id_plant: int, result_plant: int
     ) -> str:
         result_device_plant = await MeasurementService.\
@@ -186,7 +195,7 @@ class PlantsService():
 
 
     #@withSQLExceptionsHandle
-    async def delete_plant(self, response: Response, id_plant: int):
+    async def _delete_plant(self, response: Response, id_plant: int):
         try:
             plant_to_delete = self.get_plant(id_plant)
             result_plant = self.plants_repository.delete_plant(id_plant)
@@ -214,3 +223,25 @@ class PlantsService():
             else:
                 self.plants_repository.rollback()
                 raise err
+
+
+    async def delete_plant(self, id_plant: int):
+
+        try:
+            plant = self.plants_repository.get_plant_by_id(id_plant)
+            row_count = self.plants_repository.delete_plant(id_plant)
+            if row_count == 0:
+                raise RowNotFoundError(f"Could not found plant with id {id_plant}")
+        except SQLAlchemyError as err:
+            self.plants_repository.rollback()
+            raise err
+
+        try:
+            await MeasurementService.delete_device_plant(id_plant)
+        except HTTPException as err:
+            #If there is no row, ignore. It could happen sometimes :D
+            if err.status_code != status.HTTP_404_NOT_FOUND:
+                raise InternalServiceAccessError(
+                    "measurements", 
+                    "There was a problem while deleting a device_plant relation"
+                )

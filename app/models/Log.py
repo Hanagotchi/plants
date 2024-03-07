@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 from datetime import datetime
 from typing import List
-from app.models.plant import Plant
 
 from app.schemas.Log import LogCreateSchema
 
@@ -25,9 +24,9 @@ class Log(Base):
         TIMESTAMP, server_default="DEFAULT CURRENT_TIMESTAMP"
     )
     content: Mapped[str] = mapped_column(String(1000))
-    photos: Mapped[List["LogPhoto"]] = relationship(back_populates="log")
+    photos: Mapped[List["LogPhoto"]] = relationship(back_populates="log", cascade="all, delete")
     plant_id: Mapped[int] = mapped_column(ForeignKey("dev.plants.id"))
-    plant: Mapped["Plant"] = relationship("Plant")
+    plant: Mapped["Plant"] = relationship(back_populates="logs")
 
     def __repr__(self) -> str:
         return (

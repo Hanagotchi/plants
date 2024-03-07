@@ -126,7 +126,7 @@ class PlantController:
         )
     
     async def handle_delete_plant(self, response: Response, id_plant: int) -> JSONResponse:
-        await self.plants_service.delete_plant(response, id_plant)
+        await self.plants_service.delete_plant(id_plant)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content="Plant deleted successfully",

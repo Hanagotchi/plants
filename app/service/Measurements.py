@@ -1,5 +1,5 @@
 import logging
-import httpx
+from httpx import AsyncClient, HTTPStatusError, Response
 from os import environ
 from fastapi import status, HTTPException
 
@@ -11,22 +11,22 @@ MEASUREMENTS_SERVICE_URL = environ["MEASUREMENTS_SERVICE_URL"]
 
 class MeasurementService:
     @staticmethod
-    async def delete(path):
+    async def delete(path: str) -> Response:
         try:
-            async with httpx.AsyncClient() as client:
+            async with AsyncClient() as client:
                 response = await client.delete(MEASUREMENTS_SERVICE_URL + path)
-                return response
-        except Exception as e:
+                return response.raise_for_status()
+        except HTTPStatusError as e:
             logger.error(
                 "Measurements service cannot be accessed because: " + str(e)
-                )
+            )
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Measurements service cannot be accessed",
+                status_code=e.response.status_code,
+                detail=e.response.content,
             )
 
     @staticmethod
-    async def delete_device_plant(plant_id: int):
+    async def delete_device_plant(plant_id: int) -> Response:
         return await MeasurementService.delete(
             f"/device-plant/{plant_id}?type_id=id_plant"
-            )
+        )
