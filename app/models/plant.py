@@ -17,7 +17,7 @@ class Plant(Base):
     scientific_name: Mapped[str] = mapped_column(
         ForeignKey("dev.plant_types.botanical_name")
     )
-    logs: Mapped[List["Log"]] = relationship(
+    logs: Mapped[List["Log"]] = relationship( # noqa F821
         back_populates="plant", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:

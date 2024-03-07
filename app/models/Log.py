@@ -30,7 +30,7 @@ class Log(Base):
     plant_id: Mapped[int] = mapped_column(
         ForeignKey("dev.plants.id", ondelete="CASCADE")
     )
-    plant: Mapped["Plant"] = relationship(back_populates="logs")
+    plant: Mapped["Plant"] = relationship(back_populates="logs") # noqa F821
 
     def __repr__(self) -> str:
         return (
