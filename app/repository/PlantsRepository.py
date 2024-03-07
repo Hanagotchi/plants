@@ -8,6 +8,7 @@ from app.models.plant import Plant
 from app.models.base import Base
 from app.models.plant_type import PlantType
 
+
 class PlantsRepository(ABC):
 
     @abstractmethod
@@ -27,7 +28,9 @@ class PlantsRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_plants_by_user(self, id_user: int, limit: int) -> Sequence[Plant]:
+    def get_all_plants_by_user(
+        self, id_user: int, limit: int
+    ) -> Sequence[Plant]:
         pass
 
     @abstractmethod
@@ -39,10 +42,9 @@ class PlantsRepository(ABC):
         pass
 
     @abstractmethod
-    def get_logs_between(self,
-                         user_id: int,
-                         cleft: date,
-                         cright: date) -> Sequence[Log]:
+    def get_logs_between(
+        self, user_id: int, cleft: date, cright: date
+    ) -> Sequence[Log]:
         pass
 
     @abstractmethod
@@ -51,11 +53,12 @@ class PlantsRepository(ABC):
         pass
 
     @abstractmethod
-    def update_log(self,
-                   log_id: str,
-                   title: Optional[str],
-                   content: Optional[str],
-                   plant_id: Optional[int]) -> bool:
+    def update_log(
+        self, log_id: str,
+        title: Optional[str],
+        content: Optional[str],
+        plant_id: Optional[int]
+    ) -> bool:
         pass
 
     @abstractmethod

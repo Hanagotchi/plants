@@ -1,18 +1,16 @@
 from fastapi import FastAPI, Request, Response, status, Query, Body
 from app.controller.Plants import PlantController
 import logging
-from typing import List, Optional
+from typing import Optional
 from app.repository.Plants import PlantsDB
 from app.schemas.Log import (
     LogCreateSchema,
     LogPartialUpdateSchema,
     LogPhotoCreateSchema,
-    LogSchema
 )
 from app.schemas.plant import (
-    PlantSchema, PlantCreateSchema
+    PlantCreateSchema
 )
-from app.schemas.plant_type import PlantTypeSchema
 from app.service.Plants import PlantsService
 
 tags_metadata = [

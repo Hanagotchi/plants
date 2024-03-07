@@ -1,7 +1,7 @@
 import logging
 from httpx import AsyncClient, HTTPStatusError, Response
 from os import environ
-from fastapi import status, HTTPException
+from fastapi import HTTPException
 
 logger = logging.getLogger("app")
 logger.setLevel("DEBUG")

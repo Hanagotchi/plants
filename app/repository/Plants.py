@@ -8,7 +8,7 @@ from app.models.plant_type import PlantType
 from app.models.plant import Plant
 from app.models.Log import Log, LogPhoto
 
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 from datetime import date
 
 from app.repository.PlantsRepository import PlantsRepository
@@ -63,13 +63,14 @@ class PlantsDB(PlantsRepository):
         Returns:
             int: number of rows affected. 0 if no rows were affected
         """
-        
+
         delete_plant = delete(Plant).where(Plant.id == id_received)
         result = self.session.execute(delete_plant)
         self.session.commit()
         return result.rowcount
 
-    def get_all_plants_by_user(self, id_user: int, limit: int) -> Sequence[Plant]:
+    def get_all_plants_by_user(
+            self, id_user: int, limit: int) -> Sequence[Plant]:
         query = select(Plant).where(Plant.id_user == id_user).limit(limit)
         result = self.session.scalars(query).all()
         return result
@@ -80,7 +81,8 @@ class PlantsDB(PlantsRepository):
 
     def get_all_plant_types(self, limit: Optional[int]) -> Sequence[PlantType]:
         query = select(PlantType)
-        if limit: query = query.limit(limit)
+        if limit:
+            query = query.limit(limit)
         result = self.session.scalars(query).all()
         return result
 
@@ -116,7 +118,7 @@ class PlantsDB(PlantsRepository):
 
         if not title and not content and not plant_id:
             return False
-        
+
         if title:
             query = query.values(title=title)
         if content:
@@ -140,4 +142,3 @@ class PlantsDB(PlantsRepository):
         result = self.session.execute(query)
         self.session.commit()
         return result.rowcount
-    

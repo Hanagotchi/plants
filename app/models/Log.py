@@ -24,8 +24,12 @@ class Log(Base):
         TIMESTAMP, server_default="DEFAULT CURRENT_TIMESTAMP"
     )
     content: Mapped[str] = mapped_column(String(1000))
-    photos: Mapped[List["LogPhoto"]] = relationship(back_populates="log", cascade="all, delete")
-    plant_id: Mapped[int] = mapped_column(ForeignKey("dev.plants.id", ondelete="CASCADE"))
+    photos: Mapped[List["LogPhoto"]] = relationship(
+        back_populates="log", cascade="all, delete"
+    )
+    plant_id: Mapped[int] = mapped_column(
+        ForeignKey("dev.plants.id", ondelete="CASCADE")
+    )
     plant: Mapped["Plant"] = relationship(back_populates="logs")
 
     def __repr__(self) -> str:
@@ -60,7 +64,9 @@ class LogPhoto(Base):
         Integer, primary_key=True, autoincrement=True
     )
     photo_link: Mapped[str] = mapped_column(String(120))
-    log_id: Mapped[int] = mapped_column(ForeignKey("dev.logs.id", ondelete="CASCADE"))
+    log_id: Mapped[int] = mapped_column(
+        ForeignKey("dev.logs.id", ondelete="CASCADE")
+    )
     log: Mapped["Log"] = relationship(back_populates="photos")
 
     def __repr__(self) -> str:
