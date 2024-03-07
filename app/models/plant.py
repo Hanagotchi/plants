@@ -3,7 +3,7 @@ from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 from app.schemas.plant import PlantCreateSchema
-from app.models.Log import Log
+
 
 class Plant(Base):
     __tablename__ = "plants"
@@ -17,7 +17,7 @@ class Plant(Base):
     scientific_name: Mapped[str] = mapped_column(
         ForeignKey("dev.plant_types.botanical_name")
     )
-    logs: Mapped[List["Log"]] = relationship(back_populates="plant", cascade="all, delete")
+    logs: Mapped[List["Log"]] = relationship(back_populates="plant", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return (
@@ -31,4 +31,5 @@ class Plant(Base):
             id_user=pydantic_obj.id_user,
             name=pydantic_obj.name,
             scientific_name=pydantic_obj.scientific_name,
+            logs=[],
         )

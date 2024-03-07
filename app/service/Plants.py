@@ -7,11 +7,9 @@ from pydantic import BaseModel
 from app.exceptions.internal_service_access import InternalServiceAccessError
 from app.exceptions.row_not_found import RowNotFoundError
 
-from app.models import plant_type
-
-from app.models.Log import Log, LogPhoto
 from app.models.base import Base
 from app.models.plant import Plant
+from app.models.Log import Log, LogPhoto
 from app.models.plant_type import PlantType
 from app.repository.PlantsRepository import PlantsRepository
 from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogPhotoCreateSchema, LogSchema

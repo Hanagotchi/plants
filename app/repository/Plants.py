@@ -3,10 +3,10 @@ from sqlalchemy import update
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from os import environ
-from app.models.Log import Log, LogPhoto
 from app.models.base import Base
 from app.models.plant_type import PlantType
 from app.models.plant import Plant
+from app.models.Log import Log, LogPhoto
 
 from typing import List, Optional, Sequence
 from datetime import date

@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
 from datetime import date
 from typing import Optional, Sequence
-
-from sqlalchemy import ScalarResult
 from app.models.Log import Log
 
-from app.models.plant import Plant 
+
+from app.models.plant import Plant
 from app.models.base import Base
 from app.models.plant_type import PlantType
 
@@ -65,4 +64,8 @@ class PlantsRepository(ABC):
 
     @abstractmethod
     def delete_photo_from_log(self, id_log: int, id_photo: int) -> int:
+        pass
+
+    @abstractmethod
+    def get_log(self, log_id: int) -> Log:
         pass
