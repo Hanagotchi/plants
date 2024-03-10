@@ -244,6 +244,7 @@ Su temperatura de crecimiento adecuada es entre 16 a 30 ℃ y la temperatura amb
             CONSTRAINT fk_plant_type
                 FOREIGN KEY (scientific_name)
                     REFERENCES dev.plant_types(botanical_name)
+                        ON DELETE CASCADE
 
     );
 
@@ -274,6 +275,7 @@ Su temperatura de crecimiento adecuada es entre 16 a 30 ℃ y la temperatura amb
         CONSTRAINT fk_plant
             FOREIGN KEY (plant_id)
                 REFERENCES dev.plants(id)
+                    ON DELETE CASCADE
     );
 
     CREATE TRIGGER set_timestamp
@@ -288,6 +290,7 @@ Su temperatura de crecimiento adecuada es entre 16 a 30 ℃ y la temperatura amb
         CONSTRAINT fk_log
             FOREIGN KEY (log_id)
                 REFERENCES dev.logs(id)
+                    ON DELETE CASCADE
     );
 
 EOSQL
