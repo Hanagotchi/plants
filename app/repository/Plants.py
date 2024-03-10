@@ -17,14 +17,9 @@ load_dotenv()
 
 
 class PlantsDB(PlantsRepository):
-    db_url = engine.URL.create(
-        "postgresql",
-        database=environ["PLANTS_DB"],
-        username=environ["POSTGRES_USER"],
-        password=environ["POSTGRES_PASSWORD"],
-        host=environ["POSTGRES_HOST"],
-        port=int(environ["POSTGRES_PORT"]),
-    )
+    db_url = environ.get("DATABASE_URL")\
+        .replace("postgres://", "postgresql://", 1)
+
 
     engine = create_engine(db_url)
 

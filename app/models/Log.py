@@ -5,13 +5,16 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 from datetime import datetime
 from typing import List
+from os import environ
 
 from app.schemas.Log import LogCreateSchema
+
+SCHEMA = environ.get("POSTGRES_SCHEMA", "plants")
 
 
 class Log(Base):
     __tablename__ = "logs"
-    __table_args__ = {'schema': 'dev'}
+    __table_args__ = {'schema': SCHEMA}
 
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, autoincrement=True
@@ -28,7 +31,7 @@ class Log(Base):
         back_populates="log", cascade="all, delete"
     )
     plant_id: Mapped[int] = mapped_column(
-        ForeignKey("dev.plants.id", ondelete="CASCADE")
+        ForeignKey(f"{SCHEMA}.plants.id", ondelete="CASCADE")
     )
     plant: Mapped["Plant"] = relationship(back_populates="logs") # noqa F821
 
@@ -58,14 +61,14 @@ class Log(Base):
 
 class LogPhoto(Base):
     __tablename__ = "logs_photos"
-    __table_args__ = {'schema': 'dev'}
+    __table_args__ = {'schema': SCHEMA}
 
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, autoincrement=True
     )
     photo_link: Mapped[str] = mapped_column(String(120))
     log_id: Mapped[int] = mapped_column(
-        ForeignKey("dev.logs.id", ondelete="CASCADE")
+        ForeignKey(f"{SCHEMA}.logs.id", ondelete="CASCADE")
     )
     log: Mapped["Log"] = relationship(back_populates="photos")
 

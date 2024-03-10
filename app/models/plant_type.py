@@ -2,11 +2,14 @@ from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base
 from app.schemas.plant_type import PlantTypeSchema
+from os import environ
+
+SCHEMA = environ.get("POSTGRES_SCHEMA", "plants")
 
 
 class PlantType(Base):
     __tablename__ = "plant_types"
-    __table_args__ = {'schema': 'dev'}
+    __table_args__ = {'schema': SCHEMA}
 
     botanical_name: Mapped[str] = mapped_column(String(70), primary_key=True)
     id: Mapped[int] = mapped_column(Integer, nullable=False)
