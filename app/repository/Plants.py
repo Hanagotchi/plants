@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, select, delete, engine
+from sqlalchemy import create_engine, select, delete
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
@@ -19,7 +19,6 @@ load_dotenv()
 class PlantsDB(PlantsRepository):
     db_url = environ.get("DATABASE_URL")\
         .replace("postgres://", "postgresql://", 1)
-
 
     engine = create_engine(db_url)
 
