@@ -1,6 +1,6 @@
-    CREATE SCHEMA IF NOT EXISTS plants;
+    CREATE SCHEMA IF NOT EXISTS plants_service;
 
-    CREATE TABLE IF NOT EXISTS plants.plant_types (
+    CREATE TABLE IF NOT EXISTS plants_service.plant_types (
         botanical_name VARCHAR(70) PRIMARY KEY,
         id INT UNIQUE NOT NULL,
         common_name VARCHAR(70) NOT NULL,
@@ -11,8 +11,8 @@
 
     DO $do$
     BEGIN
-        IF (SELECT COUNT(*) FROM plants.plant_types) = 0 THEN
-            INSERT INTO plants.plant_types (botanical_name, id, common_name, description, cares, photo_link)
+        IF (SELECT COUNT(*) FROM plants_service.plant_types) = 0 THEN
+            INSERT INTO plants_service.plant_types (botanical_name, id, common_name, description, cares, photo_link)
             VALUES 
                  (
                 'Passiflora caerulea',
@@ -232,21 +232,21 @@ Su temperatura de crecimiento adecuada es entre 16 a 30 ℃ y la temperatura amb
     $do$;
 
     CREATE TABLE
-        IF NOT EXISTS plants.plants (
+        IF NOT EXISTS plants_service.plants (
             id SERIAL PRIMARY KEY,
             id_user INT NOT NULL,
             name VARCHAR(64) NOT NULL,
             scientific_name VARCHAR(70) NOT NULL,
             CONSTRAINT fk_plant_type
                 FOREIGN KEY (scientific_name)
-                    REFERENCES plants.plant_types(botanical_name)
+                    REFERENCES plants_service.plant_types(botanical_name)
                         ON DELETE CASCADE
 
     );
 
     DO $do$ BEGIN
-        IF (SELECT COUNT(*) FROM plants.plants) = 0 THEN
-            INSERT INTO plants.plants (id_user, name, scientific_name) VALUES
+        IF (SELECT COUNT(*) FROM plants_service.plants) = 0 THEN
+            INSERT INTO plants_service.plants (id_user, name, scientific_name) VALUES
                 (1, 'Lengua', 'Sansevieria trifasciata'),
                 (2, 'Rosa', 'Rosa chinensis'),
                 (3, 'Flor', 'Passiflora caerulea');
@@ -261,7 +261,7 @@ Su temperatura de crecimiento adecuada es entre 16 a 30 ℃ y la temperatura amb
     END;
     $$ LANGUAGE plpgsql;
 
-    CREATE TABLE IF NOT EXISTS plants.logs (
+    CREATE TABLE IF NOT EXISTS plants_service.logs (
         id SERIAL PRIMARY KEY, 
         title VARCHAR(200) NOT NULL, 
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -270,21 +270,21 @@ Su temperatura de crecimiento adecuada es entre 16 a 30 ℃ y la temperatura amb
         plant_id INT,
         CONSTRAINT fk_plant
             FOREIGN KEY (plant_id)
-                REFERENCES plants.plants(id)
+                REFERENCES plants_service.plants(id)
                     ON DELETE CASCADE
     );
 
     CREATE TRIGGER set_timestamp
-    BEFORE UPDATE ON plants.logs
+    BEFORE UPDATE ON plants_service.logs
     FOR EACH ROW
     EXECUTE FUNCTION trigger_set_timestamp();
 
-    CREATE TABLE IF NOT EXISTS plants.logs_photos (
+    CREATE TABLE IF NOT EXISTS plants_service.logs_photos (
         id SERIAL PRIMARY KEY,
         log_id INT,
         photo_link VARCHAR(120) NOT NULL, 
         CONSTRAINT fk_log
             FOREIGN KEY (log_id)
-                REFERENCES plants.logs(id)
+                REFERENCES plants_service.logs(id)
                     ON DELETE CASCADE
     );

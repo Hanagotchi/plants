@@ -4,7 +4,7 @@ from app.models.base import Base
 from app.schemas.plant_type import PlantTypeSchema
 from os import environ
 
-SCHEMA = environ.get("POSTGRES_SCHEMA", "plants")
+SCHEMA = environ.get("POSTGRES_SCHEMA", "plants_service")
 
 
 class PlantType(Base):
