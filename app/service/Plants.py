@@ -149,7 +149,7 @@ class PlantsService():
     async def create_plant(self, data: PlantCreateSchema) -> PlantSchema:
         result_user = await UserService.get_user(data.id_user)
         if result_user.status_code == status.HTTP_200_OK:
-            try: 
+            try:
                 plant = Plant.from_pydantic(data)
                 self.plants_repository.add(plant)
                 created_plant: Plant = self.plants_repository.\
