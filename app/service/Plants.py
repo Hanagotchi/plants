@@ -18,6 +18,7 @@ from app.schemas.plant import PlantCreateSchema, PlantSchema
 from app.schemas.plant_type import PlantTypeSchema
 from app.service.Measurements import MeasurementService
 from app.utils.sql_exception_handling import withSQLExceptionsHandle
+from app.service.Users import UserService
 from sqlalchemy.exc import SQLAlchemyError
 
 logger = logging.getLogger("app")
@@ -145,16 +146,23 @@ class PlantsService():
         ))
 
     @withSQLExceptionsHandle
-    def create_plant(self, data: PlantCreateSchema) -> PlantSchema:
-        try:
-            plant = Plant.from_pydantic(data)
-            self.plants_repository.add(plant)
-            created_plant: Plant = self.plants_repository.\
-                get_plant_by_id(plant.id)
-            return PlantSchema.model_validate(created_plant.__dict__)
-        except Exception as err:
-            self.plants_repository.rollback()
-            raise err
+    async def create_plant(self, data: PlantCreateSchema) -> PlantSchema:
+        result_user = await UserService.get_user(data.id_user)
+        if result_user.status_code == status.HTTP_200_OK:
+            try: 
+                plant = Plant.from_pydantic(data)
+                self.plants_repository.add(plant)
+                created_plant: Plant = self.plants_repository.\
+                    get_plant_by_id(plant.id)
+                return PlantSchema.model_validate(created_plant.__dict__)
+            except Exception as err:
+                self.plants_repository.rollback()
+                raise err
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="User data could not be retrieved"
+            )
 
     @withSQLExceptionsHandle
     def get_plant(self, id_received: int) -> PlantSchema:
@@ -217,7 +225,7 @@ class PlantsService():
                     ("Could not delete DevicePlant relation! "
                     "Rolling back plant deletion")
                 ) """
-                self.create_plant(plant_to_delete)
+                await self.create_plant(plant_to_delete)
                 # req.app.database.rollback() - "It's not possible because an
                 # external asynchronous service
                 # was called and during the await's polling another database

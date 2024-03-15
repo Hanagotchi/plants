@@ -100,8 +100,8 @@ class PlantController:
             content=jsonable_encoder(plant_type_list)
         )
 
-    def handle_create_plant(self, data: PlantCreateSchema) -> JSONResponse:
-        plant: PlantSchema = self.plants_service.create_plant(data)
+    async def handle_create_plant(self, data: PlantCreateSchema) -> JSONResponse:
+        plant: PlantSchema = await self.plants_service.create_plant(data)
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content=jsonable_encoder(plant)

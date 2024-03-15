@@ -63,7 +63,7 @@ async def shutdown_db_client():
     },
 )
 async def create_plant(item: PlantCreateSchema):
-    return plants_controller.handle_create_plant(item)
+    return await plants_controller.handle_create_plant(item)
 
 
 @app.get("/plants", tags=["Plants"])
