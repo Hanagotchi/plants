@@ -9,6 +9,7 @@ from app.schemas.Log import (
 from app.schemas.plant import PlantCreateSchema, PlantSchema
 from app.schemas.plant_type import PlantTypeSchema
 from app.service.Plants import PlantsService
+from app.exceptions.internal_service_access import InternalServiceAccessError
 from fastapi import HTTPException, status, Response
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -101,11 +102,22 @@ class PlantController:
         )
 
     async def handle_create_plant(self, data: PlantCreateSchema) -> JSONResponse:
-        plant: PlantSchema = await self.plants_service.create_plant(data)
-        return JSONResponse(
-            status_code=status.HTTP_201_CREATED,
-            content=jsonable_encoder(plant)
-        )
+        try:
+            plant: PlantSchema = await self.plants_service.create_plant(data)
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(plant)
+            )
+        except RowNotFoundError as err:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content=jsonable_encoder(err.detail)
+            )
+        except InternalServiceAccessError as err:
+            return JSONResponse(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content=jsonable_encoder(err.detail)
+            )
 
     def handle_get_plant(self, id_received: int) -> JSONResponse:
         plant: PlantSchema = self.plants_service.get_plant(id_received)

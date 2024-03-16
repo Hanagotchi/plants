@@ -147,22 +147,16 @@ class PlantsService():
 
     @withSQLExceptionsHandle
     async def create_plant(self, data: PlantCreateSchema) -> PlantSchema:
-        result_user = await UserService.get_user(data.id_user)
-        if result_user.status_code == status.HTTP_200_OK:
-            try:
-                plant = Plant.from_pydantic(data)
-                self.plants_repository.add(plant)
-                created_plant: Plant = self.plants_repository.\
-                    get_plant_by_id(plant.id)
-                return PlantSchema.model_validate(created_plant.__dict__)
-            except Exception as err:
-                self.plants_repository.rollback()
-                raise err
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="User data could not be retrieved"
-            )
+        await UserService.check_existing_user(data.id_user)
+        try:
+            plant = Plant.from_pydantic(data)
+            self.plants_repository.add(plant)
+            created_plant: Plant = self.plants_repository.\
+                get_plant_by_id(plant.id)
+            return PlantSchema.model_validate(created_plant.__dict__)
+        except Exception as err:
+            self.plants_repository.rollback()
+            raise err
 
     @withSQLExceptionsHandle
     def get_plant(self, id_received: int) -> PlantSchema:
@@ -210,37 +204,6 @@ class PlantsService():
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Internal server error",
             )
-
-    # @withSQLExceptionsHandle
-    async def _delete_plant(self, response: Response, id_plant: int):
-        try:
-            plant_to_delete = self.get_plant(id_plant)
-            result_plant = self.plants_repository.delete_plant(id_plant)
-            try:
-                return await self.delete_device_plant_association(
-                    response, id_plant, result_plant
-                )
-            except Exception as err:
-                """ logger.error(
-                    ("Could not delete DevicePlant relation! "
-                    "Rolling back plant deletion")
-                ) """
-                await self.create_plant(plant_to_delete)
-                # req.app.database.rollback() - "It's not possible because an
-                # external asynchronous service
-                # was called and during the await's polling another database
-                # transaction could have been
-                # executed over which we have no control!!"
-                raise err
-        except HTTPException as err:
-            if err.status_code == status.HTTP_404_NOT_FOUND:
-                # Prevents the deletion of a device-plant association
-                # if the plant was not found!
-                return await self.\
-                    delete_device_plant_association(response, id_plant, 0)
-            else:
-                self.plants_repository.rollback()
-                raise err
 
     async def delete_plant(self, id_plant: int):
         try:
