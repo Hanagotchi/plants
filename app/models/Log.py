@@ -9,7 +9,7 @@ from os import environ
 
 from app.schemas.Log import LogCreateSchema
 
-SCHEMA = environ.get("POSTGRES_SCHEMA", "plants")
+SCHEMA = environ.get("POSTGRES_SCHEMA", "plants_service")
 
 
 class Log(Base):

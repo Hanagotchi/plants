@@ -38,7 +38,9 @@ services:
           "${POSTGRES_PORT}",
           "-q",
           "-U",
-          "${POSTGRES_USER}"
+          "${POSTGRES_USER}",
+          "-d",
+          "${POSTGRES_DB}"
         ]
       interval: 5s
       timeout: 3s

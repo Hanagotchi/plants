@@ -162,7 +162,7 @@ components:
         scientific_name:
           type: string
           title: Scientific Name
-          example: Aguspolis grandis
+          example: Thunbergia alata
       type: object
       required:
         - id
