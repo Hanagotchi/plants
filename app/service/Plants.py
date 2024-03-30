@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 import logging
 from fastapi import Response, status, HTTPException
 from typing import List, Optional, Sequence
@@ -53,7 +53,7 @@ class PlantsService():
     ) -> List[LogSchema]:
         if month:
             left = date(year, month, 1)
-            right = left + timedelta(weeks=4)
+            right = date(year+1, 1, 1) if month == 12 else date(year, month+1, 1)
         else:
             left = date(year, 1, 1)
             right = date(year+1, 1, 1)
