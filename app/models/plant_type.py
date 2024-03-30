@@ -16,7 +16,7 @@ class PlantType(Base):
     common_name: Mapped[str] = mapped_column(String(70))
     description: Mapped[str] = mapped_column(String(1000))
     cares: Mapped[str] = mapped_column(String(1000))
-    photo_link: Mapped[str] = mapped_column(String(160))
+    photo_link: Mapped[str] = mapped_column(String(300))
 
     def __repr__(self) -> str:
         return (f"PlantType(botanical_name={self.botanical_name}, "

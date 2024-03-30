@@ -6,7 +6,7 @@
         common_name VARCHAR(70) NOT NULL,
         description VARCHAR(1000) NOT NULL,
         cares VARCHAR(1000) NOT NULL,
-        photo_link VARCHAR(160) NOT NULL
+        photo_link VARCHAR(300) NOT NULL
     );
 
     DO $do$
@@ -282,7 +282,7 @@ Su temperatura de crecimiento adecuada es entre 16 a 30 ℃ y la temperatura amb
     CREATE TABLE IF NOT EXISTS plants_service.logs_photos (
         id SERIAL PRIMARY KEY,
         log_id INT,
-        photo_link VARCHAR(120) NOT NULL, 
+        photo_link VARCHAR(300) NOT NULL, 
         CONSTRAINT fk_log
             FOREIGN KEY (log_id)
                 REFERENCES plants_service.logs(id)

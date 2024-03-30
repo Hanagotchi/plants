@@ -6,7 +6,7 @@ link = "https://pbs.twimg.com/media/EiSK6SgXsAAIQDC?format=jpg&name=small"
 
 
 class LogPhotoCreateSchema(BaseModel):
-    photo_link: str = Field(...)
+    photo_link: str = Field(..., max_length=300)
 
     class Config:
         json_schema_extra = {

@@ -66,7 +66,7 @@ class LogPhoto(Base):
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, autoincrement=True
     )
-    photo_link: Mapped[str] = mapped_column(String(120))
+    photo_link: Mapped[str] = mapped_column(String(300))
     log_id: Mapped[int] = mapped_column(
         ForeignKey(f"{SCHEMA}.logs.id", ondelete="CASCADE")
     )
