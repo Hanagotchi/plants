@@ -10,7 +10,7 @@ class PlantTypeSchema(BaseModel):
     common_name: str = Field(..., max_length=70)
     description: str = Field(..., max_length=1000)
     cares: str = Field(..., max_length=1000)
-    photo_link: str = Field(..., max_length=160)
+    photo_link: str = Field(..., max_length=300)
 
     class Config:
         json_schema_extra = {
