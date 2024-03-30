@@ -53,7 +53,7 @@ class PlantsService():
     ) -> List[LogSchema]:
         if month:
             left = date(year, month, 1)
-            right = date(year+1, 1, 1) if month == 11 else date(year, month+1, 1)
+            right = date(year+1, 1, 1) if month == 12 else date(year, month+1, 1)
             print(left)
             print(right)
         else:
