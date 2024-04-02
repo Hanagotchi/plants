@@ -1,6 +1,6 @@
 from datetime import date
 import logging
-from fastapi import Response, status, HTTPException
+from fastapi import status, HTTPException
 from typing import List, Optional, Sequence
 from app.exceptions.internal_service_access import InternalServiceAccessError
 from app.exceptions.row_not_found import RowNotFoundError
@@ -43,7 +43,7 @@ class PlantsService():
         except Exception as err:
             self.plants_repository.rollback()
             raise err
-        
+
     @withSQLExceptionsHandle
     def get_log(self, log_id: int) -> LogSchema:
         try:

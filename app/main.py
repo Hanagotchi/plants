@@ -131,12 +131,14 @@ async def get_plant_type(
 ):
     return plants_controller.handle_get_plant_type(botanical_name)
 
+
 @app.get(
     "/logs/{id_log}",
     tags=["Logs"],
 )
 async def get_log(id_log: int):
     return plants_controller.handle_get_log(id_log)
+
 
 @app.post(
     "/logs",
@@ -157,6 +159,7 @@ async def update_fields_in_log(id_log: str,
                                LogPartialUpdateSchema = Body(...)):
     return plants_controller.handle_update_log(id_log, log_update_set)
 
+
 @app.get(
     "/logs/user/{user_id}",
     tags=["Logs"],
@@ -167,6 +170,7 @@ async def get_logs_by_user(
     month: Optional[int] = Query(None, ge=1, le=12)
 ):
     return plants_controller.handle_get_logs_by_user(user_id, year, month)
+
 
 @app.post(
     "/logs/{id_log}/photos",
