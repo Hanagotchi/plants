@@ -180,31 +180,6 @@ class PlantsService():
             self.plants_repository.get_all_plants_by_user(id_user, limit)
         ))
 
-    # @withSQLExceptionsHandle
-    async def _delete_device_plant_association(
-        self, response: Response, id_plant: int, result_plant: int
-    ) -> str:
-        result_device_plant = await MeasurementService.\
-                                delete_device_plant(id_plant)
-        if result_device_plant.status_code == status.HTTP_200_OK:
-            if result_plant == 0:
-                return ("Successfully deleted DevicePlant relation "
-                        "but the Plant was already deleted")
-            else:
-                return "Successfully deleted Plant and DevicePlant relation"
-        elif result_device_plant.status_code == status.HTTP_204_NO_CONTENT:
-            if result_plant == 0:
-                response.status_code = status.HTTP_204_NO_CONTENT
-                return
-            else:
-                return ("Successfully deleted Plant but the "
-                        "DevicePlant relations was already deleted")
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Internal server error",
-            )
-
     async def delete_plant(self, id_plant: int):
         try:
             row_count = self.plants_repository.delete_plant(id_plant)
