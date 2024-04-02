@@ -48,6 +48,7 @@ class PlantsService():
     def get_log(self, log_id: int) -> LogSchema:
         try:
             log: Log = self.plants_repository.get_log(log_id)
+            print(log)
             return LogSchema.model_validate(log.__dict__)
         except NoResultFound:
             raise RowNotFoundError(f"Could not found log with id {log_id}")

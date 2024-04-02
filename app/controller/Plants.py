@@ -31,7 +31,7 @@ class PlantController:
         try:
             log: LogSchema = self.plants_service.get_log(log_id)
             return JSONResponse(
-                status_code=status.HTTP_201_CREATED,
+                status_code=status.HTTP_200_OK,
                 content=jsonable_encoder(log)
             )
         except RowNotFoundError as e:
