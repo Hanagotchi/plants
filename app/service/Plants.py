@@ -19,7 +19,7 @@ from app.schemas.plant_type import PlantTypeSchema
 from app.service.Measurements import MeasurementService
 from app.utils.sql_exception_handling import withSQLExceptionsHandle
 from app.service.Users import UserService
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 
 logger = logging.getLogger("app")
 logger.setLevel("DEBUG")
@@ -43,6 +43,14 @@ class PlantsService():
         except Exception as err:
             self.plants_repository.rollback()
             raise err
+        
+    @withSQLExceptionsHandle
+    def get_log(self, log_id: int) -> LogSchema:
+        try:
+            log: Log = self.plants_repository.get_log(log_id)
+            return LogSchema.model_validate(log.__dict__)
+        except NoResultFound:
+            raise RowNotFoundError(f"Could not found log with id {log_id}")
 
     @withSQLExceptionsHandle
     def get_logs_by_user(

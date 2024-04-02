@@ -132,6 +132,7 @@ async def get_plant_type(
     return plants_controller.handle_get_plant_type(botanical_name)
 
 
+
 @app.post(
     "/logs",
     tags=["Logs"],

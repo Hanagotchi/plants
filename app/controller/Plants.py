@@ -26,6 +26,20 @@ class PlantController:
             status_code=status.HTTP_201_CREATED,
             content=jsonable_encoder(log)
         )
+    
+    def handle_get_log(self, log_id: int) -> JSONResponse:
+        try:
+            log: LogSchema = self.plants_service.get_log(log_id)
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=jsonable_encoder(log)
+            )
+        except RowNotFoundError as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Could not found a log with id {log_id}"
+            )
+    
 
     def handle_get_logs_by_user(self,
                                 user_id: int,
