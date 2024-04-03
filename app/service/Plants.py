@@ -48,6 +48,8 @@ class PlantsService():
     def get_log(self, log_id: int) -> LogSchema:
         try:
             log: Log = self.plants_repository.get_log(log_id)
+            # TODO: Este print hace que los logs se parsen bien a LogSchemas.
+            # No quitar a menos que se encuentre una mejor solucion.
             print(log)
             return LogSchema.model_validate(log.__dict__)
         except NoResultFound:
