@@ -27,6 +27,13 @@ class PlantController:
             content=jsonable_encoder(log)
         )
 
+    def handle_get_log(self, log_id: int) -> JSONResponse:
+        log: LogSchema = self.plants_service.get_log(log_id)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=jsonable_encoder(log)
+        )
+
     def handle_get_logs_by_user(self,
                                 user_id: int,
                                 year: int,

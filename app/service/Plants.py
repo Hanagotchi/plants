@@ -1,6 +1,6 @@
 from datetime import date
 import logging
-from fastapi import Response, status, HTTPException
+from fastapi import status, HTTPException
 from typing import List, Optional, Sequence
 from app.exceptions.internal_service_access import InternalServiceAccessError
 from app.exceptions.row_not_found import RowNotFoundError
@@ -19,7 +19,7 @@ from app.schemas.plant_type import PlantTypeSchema
 from app.service.Measurements import MeasurementService
 from app.utils.sql_exception_handling import withSQLExceptionsHandle
 from app.service.Users import UserService
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 
 logger = logging.getLogger("app")
 logger.setLevel("DEBUG")
@@ -43,6 +43,20 @@ class PlantsService():
         except Exception as err:
             self.plants_repository.rollback()
             raise err
+
+    @withSQLExceptionsHandle
+    def get_log(self, log_id: int) -> LogSchema:
+        try:
+            log: Log = self.plants_repository.get_log(log_id)
+            # TODO: Este print hace que los logs se parsen bien a LogSchemas.
+            # No quitar a menos que se encuentre una mejor solucion.
+            print(log)
+            return LogSchema.model_validate(log.__dict__)
+        except NoResultFound:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Could not found a log with id {log_id}"
+            )
 
     @withSQLExceptionsHandle
     def get_logs_by_user(
@@ -179,31 +193,6 @@ class PlantsService():
             lambda pl: PlantSchema.model_validate(pl.__dict__),
             self.plants_repository.get_all_plants_by_user(id_user, limit)
         ))
-
-    # @withSQLExceptionsHandle
-    async def _delete_device_plant_association(
-        self, response: Response, id_plant: int, result_plant: int
-    ) -> str:
-        result_device_plant = await MeasurementService.\
-                                delete_device_plant(id_plant)
-        if result_device_plant.status_code == status.HTTP_200_OK:
-            if result_plant == 0:
-                return ("Successfully deleted DevicePlant relation "
-                        "but the Plant was already deleted")
-            else:
-                return "Successfully deleted Plant and DevicePlant relation"
-        elif result_device_plant.status_code == status.HTTP_204_NO_CONTENT:
-            if result_plant == 0:
-                response.status_code = status.HTTP_204_NO_CONTENT
-                return
-            else:
-                return ("Successfully deleted Plant but the "
-                        "DevicePlant relations was already deleted")
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Internal server error",
-            )
 
     async def delete_plant(self, id_plant: int):
         try:

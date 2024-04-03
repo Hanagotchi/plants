@@ -132,6 +132,14 @@ async def get_plant_type(
     return plants_controller.handle_get_plant_type(botanical_name)
 
 
+@app.get(
+    "/logs/{id_log}",
+    tags=["Logs"],
+)
+async def get_log(id_log: int):
+    return plants_controller.handle_get_log(id_log)
+
+
 @app.post(
     "/logs",
     tags=["Logs"],
@@ -142,8 +150,19 @@ async def create_log(
     return plants_controller.handle_create_log(item)
 
 
+@app.patch(
+    "/logs/{id_log}",
+    tags=["Logs"],
+)
+async def update_fields_in_log(id_log: str,
+                               log_update_set:
+                               LogPartialUpdateSchema = Body(...)):
+    return plants_controller.handle_update_log(id_log, log_update_set)
+
+
 @app.get(
-    "/logs/{user_id}",
+    "/logs/user/{user_id}",
+    tags=["Logs"],
 )
 async def get_logs_by_user(
     user_id: int,
@@ -153,17 +172,9 @@ async def get_logs_by_user(
     return plants_controller.handle_get_logs_by_user(user_id, year, month)
 
 
-@app.patch(
-    "/{id_log}",
-)
-async def update_fields_in_log(id_log: str,
-                               log_update_set:
-                               LogPartialUpdateSchema = Body(...)):
-    return plants_controller.handle_update_log(id_log, log_update_set)
-
-
 @app.post(
-    "/{id_log}/photos",
+    "/logs/{id_log}/photos",
+    tags=["Logs"],
 )
 async def add_photo(id_log: str,
                     photo_create_set:
@@ -172,7 +183,8 @@ async def add_photo(id_log: str,
 
 
 @app.delete(
-    "/{id_log}/photos/{id_photo}",
+    "/logs/{id_log}/photos/{id_photo}",
+    tags=["Logs"],
 )
 async def delete_photo(id_log: int,
                        id_photo: int):
