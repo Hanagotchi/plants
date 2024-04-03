@@ -51,7 +51,10 @@ class PlantsService():
             print(log)
             return LogSchema.model_validate(log.__dict__)
         except NoResultFound:
-            raise RowNotFoundError(f"Could not found log with id {log_id}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Could not found a log with id {log_id}"
+            )
 
     @withSQLExceptionsHandle
     def get_logs_by_user(
