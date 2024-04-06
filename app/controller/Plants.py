@@ -78,18 +78,15 @@ class PlantController:
             content=jsonable_encoder(log)
         )
 
-    def handle_delete_photo(self, id_log: int, id_photo: int) -> JSONResponse:
+    def handle_delete_photo(self,  response: Response, id_log: int, id_photo: int) -> JSONResponse:
         try:
             self.plants_service.delete_photo(id_log, id_photo)
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
                 content="Photo deleted successfully"
             )
-        except RowNotFoundError as err:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content=jsonable_encoder(err.detail)
-            )
+        except RowNotFoundError:
+            response.status_code = status.HTTP_204_NO_CONTENT
 
     def handle_get_plant_type(self, botanical_name: str) -> JSONResponse:
         plant_type: PlantTypeSchema = self.plants_service.get_plant_type(
@@ -169,8 +166,16 @@ class PlantController:
             response: Response,
             id_plant: int
             ) -> JSONResponse:
-        await self.plants_service.delete_plant(id_plant)
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content="Plant deleted successfully",
-        )
+        try:
+            await self.plants_service.delete_plant(id_plant)
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content="Plant deleted successfully",
+            )
+        except RowNotFoundError:
+            response.status_code = status.HTTP_204_NO_CONTENT
+        except InternalServiceAccessError as err:
+            return JSONResponse(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content=jsonable_encoder(err.detail)
+            )

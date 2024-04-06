@@ -7,33 +7,58 @@ logger = logging.getLogger("app")
 logger.setLevel("DEBUG")
 
 
-def withSQLExceptionsHandle(func):
-    def handleSQLException(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except IntegrityError as err:
-            if isinstance(err.orig, UniqueViolation):
-                parsed_error = err.orig.pgerror.split("\n")
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail={
-                        "error": parsed_error[0],
-                        "detail": parsed_error[1]
-                    })
-
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=format(err))
-
-        except PendingRollbackError as err:
-            logger.warning(format(err))
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=format(err))
-
-        except NoResultFound as err:
+def handle_common_errors(err):
+    if isinstance(err, IntegrityError):
+        # parsed_error = err.orig.pgerror.split("\n")[1]
+        # return JSONResponse(
+        #     status_code=status.HTTP_400_BAD_REQUEST,
+        #     content=parsed_error,
+        # )
+        if isinstance(err.orig, UniqueViolation):
+            parsed_error = err.orig.pgerror.split("\n")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=format(err))
+                detail={
+                    "error": parsed_error[0],
+                    "detail": parsed_error[1]
+                })
 
-    return handleSQLException
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=format(err))
+
+    if isinstance(err, PendingRollbackError):
+        logger.warning(format(err))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=format(err)
+        )
+
+    if isinstance(err, NoResultFound):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=format(err)
+        )
+
+    logger.error(format(err))
+    raise err
+
+
+def withSQLExceptionsHandle(async_mode: bool = False):
+    def decorator(func):
+        async def handleAsyncSQLException(*args, **kwargs):
+            try:
+                return await func(*args, **kwargs)
+            except Exception as err:
+                return handle_common_errors(err)
+
+        def handleSyncSQLException(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as err:
+                return handle_common_errors(err)
+
+        return (
+            handleAsyncSQLException if async_mode else handleSyncSQLException
+        )
+
+    return decorator

@@ -30,7 +30,6 @@ class PlantsService():
     def __init__(self, plants_repository: PlantsRepository):
         self.plants_repository = plants_repository
 
-    @withSQLExceptionsHandle
     def create_log(self, input_log: LogCreateSchema) -> LogSchema:
         try:
             log = Log.from_pydantic(input_log)
@@ -44,7 +43,6 @@ class PlantsService():
             self.plants_repository.rollback()
             raise err
 
-    @withSQLExceptionsHandle
     def get_log(self, log_id: int) -> LogSchema:
         try:
             log: Log = self.plants_repository.get_log(log_id)
@@ -58,7 +56,6 @@ class PlantsService():
                 detail=f"Could not found a log with id {log_id}"
             )
 
-    @withSQLExceptionsHandle
     def get_logs_by_user(
         self,
         user_id: int,
@@ -83,7 +80,6 @@ class PlantsService():
             logs
         ))
 
-    @withSQLExceptionsHandle
     def update_log(
         self,
         log_id: str,
@@ -107,7 +103,6 @@ class PlantsService():
             self.plants_repository.rollback()
             raise err
 
-    @withSQLExceptionsHandle
     def add_photo(
         self,
         id_log: str,
@@ -126,7 +121,6 @@ class PlantsService():
             self.plants_repository.rollback()
             raise err
 
-    @withSQLExceptionsHandle
     def delete_photo(self, id_log: int, id_photo: int):
         try:
             result_rowcount = self.plants_repository.delete_photo_from_log(
@@ -139,17 +133,15 @@ class PlantsService():
                         f"{id_photo} in log with id {id_log}"
                     )
                 )
-        except SQLAlchemyError as err:
+        except Exception as err:
             self.plants_repository.rollback()
             raise err
 
-    @withSQLExceptionsHandle
     def get_plant_type(self, botanical_name: str) -> PlantTypeSchema:
         plant_type = self.plants_repository.\
             get_plant_type_by_botanical_name(botanical_name)
         return PlantTypeSchema.model_validate(plant_type.__dict__)
 
-    @withSQLExceptionsHandle
     def get_all_plant_types(
         self, limit: Optional[int]
     ) -> List[PlantTypeSchema]:
@@ -159,7 +151,6 @@ class PlantsService():
             plant_types
         ))
 
-    @withSQLExceptionsHandle
     async def create_plant(self, data: PlantCreateSchema) -> PlantSchema:
         await UserService.check_existing_user(data.id_user)
         try:
@@ -172,20 +163,17 @@ class PlantsService():
             self.plants_repository.rollback()
             raise err
 
-    @withSQLExceptionsHandle
     def get_plant(self, id_received: int) -> PlantSchema:
         return PlantSchema.model_validate(
             self.plants_repository.get_plant_by_id(id_received).__dict__
         )
 
-    @withSQLExceptionsHandle
     def get_all_plants(self, limit: int) -> List[PlantSchema]:
         return list(map(
             lambda pl: PlantSchema.model_validate(pl.__dict__),
             self.plants_repository.get_all_plants(limit)
         ))
 
-    @withSQLExceptionsHandle
     def get_plants_by_user(
         self, id_user: int, limit: int
     ) -> List[PlantSchema]:
@@ -201,7 +189,7 @@ class PlantsService():
                 raise RowNotFoundError(
                     f"Could not found plant with id {id_plant}"
                 )
-        except SQLAlchemyError as err:
+        except Exception as err:
             self.plants_repository.rollback()
             raise err
 
