@@ -78,9 +78,9 @@ class PlantController:
             content=jsonable_encoder(log)
         )
 
-    def handle_delete_photo(self, 
-                            response: Response, 
-                            id_log: int, 
+    def handle_delete_photo(self,
+                            response: Response,
+                            id_log: int,
                             id_photo: int) -> JSONResponse:
         try:
             self.plants_service.delete_photo(id_log, id_photo)
