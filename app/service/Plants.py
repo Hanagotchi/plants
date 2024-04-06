@@ -90,7 +90,7 @@ class PlantsService():
         log_update_set: LogPartialUpdateSchema
     ) -> Optional[LogSchema]:
         try:
-            result = self.plants_repository.update_log(
+            self.plants_repository.update_log(
                 log_id,
                 log_update_set.title,
                 log_update_set.content,
