@@ -17,9 +17,7 @@ from app.schemas.Log import (
 from app.schemas.plant import PlantCreateSchema, PlantSchema
 from app.schemas.plant_type import PlantTypeSchema
 from app.service.Measurements import MeasurementService
-from app.utils.sql_exception_handling import withSQLExceptionsHandle
 from app.service.Users import UserService
-from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 
 logger = logging.getLogger("app")
 logger.setLevel("DEBUG")
@@ -44,17 +42,11 @@ class PlantsService():
             raise err
 
     def get_log(self, log_id: int) -> LogSchema:
-        try:
-            log: Log = self.plants_repository.get_log(log_id)
-            # TODO: Este print hace que los logs se parsen bien a LogSchemas.
-            # No quitar a menos que se encuentre una mejor solucion.
-            print(log)
-            return LogSchema.model_validate(log.__dict__)
-        except NoResultFound:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Could not found a log with id {log_id}"
-            )
+        log: Log = self.plants_repository.get_log(log_id)
+        # TODO: Este print hace que los logs se parsen bien a LogSchemas.
+        # No quitar a menos que se encuentre una mejor solucion.
+        print(log)
+        return LogSchema.model_validate(log.__dict__)
 
     def get_logs_by_user(
         self,

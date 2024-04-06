@@ -36,7 +36,7 @@ def handle_common_errors(err):
 
     if isinstance(err, NoResultFound):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=format(err)
+            status_code=status.HTTP_404_NOT_FOUND, detail=format(err)
         )
 
     logger.error(format(err))
