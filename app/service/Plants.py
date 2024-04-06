@@ -90,14 +90,13 @@ class PlantsService():
         log_update_set: LogPartialUpdateSchema
     ) -> Optional[LogSchema]:
         try:
-            result = self.plants_repository.update_log(
+            self.plants_repository.update_log(
                 log_id,
                 log_update_set.title,
                 log_update_set.content,
                 log_update_set.plant_id
             )
-            if not result:
-                return None
+
             log = self.plants_repository.find_by_log_id(log_id)
             # TODO: Este print hace que los logs se parsen bien a LogSchemas.
             # No quitar a menos que se encuentre una mejor solucion.
