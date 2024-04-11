@@ -12,6 +12,7 @@ from typing import Optional, Sequence
 from datetime import date
 
 from app.repository.PlantsRepository import PlantsRepository
+from app.utils.sql_exception_handling import withSQLExceptionsHandle
 
 load_dotenv()
 
@@ -38,17 +39,20 @@ class PlantsDB(PlantsRepository):
         self.session.execute(query)
         self.session.commit()
 
+    @withSQLExceptionsHandle()
     def get_plant_by_id(self, id_received: int) -> Plant:
         query = select(Plant).where(Plant.id == id_received)
         result = self.session.scalars(query).one()
         return result
 
+    @withSQLExceptionsHandle()
     def get_all_plants(self, limit: int) -> Sequence[Plant]:
         query = select(Plant).limit(limit)
         result = self.session.scalars(query).all()
         print(result)
         return result
 
+    @withSQLExceptionsHandle()
     def delete_plant(self, id_received: int) -> int:
         """
         Delete a plant by id and its logs
@@ -63,16 +67,19 @@ class PlantsDB(PlantsRepository):
         self.session.commit()
         return result.rowcount
 
+    @withSQLExceptionsHandle()
     def get_all_plants_by_user(
             self, id_user: int, limit: int) -> Sequence[Plant]:
         query = select(Plant).where(Plant.id_user == id_user).limit(limit)
         result = self.session.scalars(query).all()
         return result
 
+    @withSQLExceptionsHandle()
     def add(self, record: Base):
         self.session.add(record)
         self.session.commit()
 
+    @withSQLExceptionsHandle()
     def get_all_plant_types(self, limit: Optional[int]) -> Sequence[PlantType]:
         query = select(PlantType)
         if limit:
@@ -80,11 +87,13 @@ class PlantsDB(PlantsRepository):
         result = self.session.scalars(query).all()
         return result
 
+    @withSQLExceptionsHandle()
     def get_log(self, log_id: int) -> Log:
         query = select(Log).where(Log.id == log_id)
         result = self.session.scalars(query).one()
         return result
 
+    @withSQLExceptionsHandle()
     def get_logs_between(self,
                          user_id: int,
                          cleft: date,
@@ -96,6 +105,7 @@ class PlantsDB(PlantsRepository):
         result = self.session.scalars(query).all()
         return result
 
+    @withSQLExceptionsHandle()
     def get_plant_type_by_botanical_name(
             self, botanical_name_given: str) -> PlantType:
         query = select(PlantType).where(
@@ -103,6 +113,7 @@ class PlantsDB(PlantsRepository):
         result = self.session.scalars(query).one()
         return result
 
+    @withSQLExceptionsHandle()
     def update_log(self,
                    log_id: str,
                    title: Optional[str],
@@ -124,11 +135,13 @@ class PlantsDB(PlantsRepository):
         self.session.commit()
         return True
 
+    @withSQLExceptionsHandle()
     def find_by_log_id(self, log_id: str) -> Log:
         query = select(Log).where(Log.id == log_id)
         result = self.session.scalars(query).one()
         return result
 
+    @withSQLExceptionsHandle()
     def delete_photo_from_log(self, id_log: int, id_photo: int) -> int:
         query = delete(LogPhoto).where(
             LogPhoto.id == id_photo, LogPhoto.log_id == id_log
