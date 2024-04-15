@@ -61,7 +61,7 @@ async def create_plant(item: PlantCreateSchema):
 
 
 @app.get("/plants", tags=["Plants"])
-async def get_all_plants(id_user: int = Query(None), limit: int = Query(1024)):
+def get_all_plants(id_user: int = Query(None), limit: int = Query(1024)):
     if id_user is not None:
         return plants_controller.handle_get_plants_by_user(id_user, limit)
 
@@ -79,7 +79,7 @@ async def get_all_plants(id_user: int = Query(None), limit: int = Query(1024)):
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
-async def get_one_plant(req: Request, id_plant: int):
+def get_one_plant(req: Request, id_plant: int):
     return plants_controller.handle_get_plant(id_plant)
 
 
@@ -106,7 +106,7 @@ async def delete_plant(response: Response, id_plant: int):
     "/plant-type",
     tags=["Plant types"],
 )
-async def get_all_plant_types(req: Request, limit: Optional[int] = None):
+def get_all_plant_types(req: Request, limit: Optional[int] = None):
     return plants_controller.handle_get_all_plant_types(limit)
 
 
@@ -114,7 +114,7 @@ async def get_all_plant_types(req: Request, limit: Optional[int] = None):
     "/plant-type/{botanical_name}",
     tags=["Plant types"],
 )
-async def get_plant_type(
+def get_plant_type(
     botanical_name: str,
 ):
     return plants_controller.handle_get_plant_type(botanical_name)
@@ -124,7 +124,7 @@ async def get_plant_type(
     "/logs/{id_log}",
     tags=["Logs"],
 )
-async def get_log(id_log: int):
+def get_log(id_log: int):
     return plants_controller.handle_get_log(id_log)
 
 
@@ -132,7 +132,7 @@ async def get_log(id_log: int):
     "/logs",
     tags=["Logs"],
 )
-async def create_log(item: LogCreateSchema):
+def create_log(item: LogCreateSchema):
     return plants_controller.handle_create_log(item)
 
 
@@ -140,7 +140,7 @@ async def create_log(item: LogCreateSchema):
     "/logs/{id_log}",
     tags=["Logs"],
 )
-async def update_fields_in_log(
+def update_fields_in_log(
     id_log: str, log_update_set: LogPartialUpdateSchema = Body(...)
 ):
     return plants_controller.handle_update_log(id_log, log_update_set)
@@ -150,7 +150,7 @@ async def update_fields_in_log(
     "/logs/user/{user_id}",
     tags=["Logs"],
 )
-async def get_logs_by_user(
+def get_logs_by_user(
     user_id: int,
     year: int = Query(..., gt=0),
     month: Optional[int] = Query(None, ge=1, le=12),
@@ -162,7 +162,7 @@ async def get_logs_by_user(
     "/logs/{id_log}/photos",
     tags=["Logs"],
 )
-async def add_photo(id_log: str, photo_create_set: LogPhotoCreateSchema = Body(...)):
+def add_photo(id_log: str, photo_create_set: LogPhotoCreateSchema = Body(...)):
     return plants_controller.handle_add_photo(id_log, photo_create_set)
 
 
@@ -170,5 +170,5 @@ async def add_photo(id_log: str, photo_create_set: LogPhotoCreateSchema = Body(.
     "/logs/{id_log}/photos/{id_photo}",
     tags=["Logs"],
 )
-async def delete_photo(response: Response, id_log: int, id_photo: int):
+def delete_photo(response: Response, id_log: int, id_photo: int):
     return plants_controller.handle_delete_photo(response, id_log, id_photo)
