@@ -1,3 +1,5 @@
+from app.service.Measurements import MeasurementService
+from app.service.Users import UserService
 from fastapi import FastAPI, Request, Response, status, Query, Body
 from app.controller.Plants import PlantController
 import logging
@@ -23,7 +25,9 @@ app = FastAPI(
 )
 
 plants_repository = PlantsDB()
-plants_service = PlantsService(plants_repository)
+measurement_service = MeasurementService()
+user_service = UserService()
+plants_service = PlantsService(plants_repository, measurement_service, user_service)
 plants_controller = PlantController(plants_service)
 
 logger = logging.getLogger("plants")
