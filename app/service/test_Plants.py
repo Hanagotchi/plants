@@ -1,5 +1,5 @@
 from app.exceptions.internal_service_access import InternalServiceAccessError
-from app.schemas.Log import LogSchema
+from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogSchema
 from dotenv import load_dotenv
 load_dotenv()
 import unittest
@@ -58,6 +58,17 @@ FAKE_LOG_1: LogSchema = LogSchema(
     updated_at=datetime(1997, 11, 14)
 )
 
+FAKE_LOG_CREATE_SET_1: LogCreateSchema = LogCreateSchema(
+    title=FAKE_LOG_1.title,
+    content=FAKE_LOG_1.content,
+    photos=FAKE_LOG_1.photos,
+    plant_id=FAKE_LOG_1.plant_id,
+)
+
+FAKE_LOG_UPDATE_SET_1: LogPartialUpdateSchema = LogPartialUpdateSchema(
+    title="new_fake_title_1",
+)
+
 FAKE_LOG_2: LogSchema = LogSchema(
     id=2,
     title="fake_title_2",
@@ -66,6 +77,13 @@ FAKE_LOG_2: LogSchema = LogSchema(
     plant_id=FAKE_PLANT_2.id,
     created_at=datetime(1997, 11, 14),
     updated_at=datetime(1997, 11, 14)
+)
+
+FAKE_LOG_CREATE_SET_2: LogCreateSchema = LogCreateSchema(
+    title=FAKE_LOG_2.title,
+    content=FAKE_LOG_2.content,
+    photos=FAKE_LOG_2.photos,
+    plant_id=FAKE_LOG_2.plant_id,
 )
 
 class TestCourses(unittest.IsolatedAsyncioTestCase):
@@ -306,5 +324,93 @@ class TestCourses(unittest.IsolatedAsyncioTestCase):
         )
         mock_db.get_logs_between.assert_called_once_with(FAKE_USER_ID, date(2024, 3, 1), date(2024, 4, 1))
 
+    def testGetLogsByUserWorksCorrectlyWithDecemberAsMonth(self):
+        FAKE_USER_ID = 1
+        attr_db = {
+            "get_logs_between.return_value": [FAKE_LOG_1, FAKE_LOG_2],
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
 
+        self.assertEqual(
+            service.get_logs_by_user(FAKE_USER_ID, 2024, 12), [FAKE_LOG_1, FAKE_LOG_2]
+        )
+        mock_db.get_logs_between.assert_called_once_with(FAKE_USER_ID, date(2024, 12, 1), date(2025, 1, 1))
+
+    def testGetLogsByUserWorksCorrectlyWithoutMonth(self):
+        FAKE_USER_ID = 1
+        attr_db = {
+            "get_logs_between.return_value": [FAKE_LOG_1, FAKE_LOG_2],
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
+
+        self.assertEqual(
+            service.get_logs_by_user(FAKE_USER_ID, 2024, None), [FAKE_LOG_1, FAKE_LOG_2]
+        )
+        mock_db.get_logs_between.assert_called_once_with(FAKE_USER_ID, date(2024, 1, 1), date(2025, 1, 1))
+
+    def testCreateLogWorksCorrectly(self):
+        attr_db = {
+            "add.return_value": None,
+            "get_log.return_value": FAKE_LOG_1,
+            "rollback.return_value": None,
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
+
+        self.assertEqual(
+            service.create_log(FAKE_LOG_CREATE_SET_1), FAKE_LOG_1
+        )
+        mock_db.add.assert_called_once()
+        mock_db.get_log.assert_called_once()
+        mock_db.rollback.assert_not_called()
+
+    def testCreateLogWorksThrowsExceptionAndRollback(self):
+        attr_db = {
+            "add.side_effect": Exception(),
+            "get_log.return_value": FAKE_LOG_1,
+            "rollback.return_value": None,
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
+
+        with self.assertRaises(Exception):
+            service.create_log(FAKE_LOG_CREATE_SET_1)
+
+        mock_db.add.assert_called_once()
+        mock_db.get_log.assert_not_called()
+        mock_db.rollback.assert_called_once()
+
+    def testUpdateLogWorksCorrectly(self):
+        attr_db = {
+            "update_log.return_value": True,
+            "find_by_log_id.return_value": FAKE_LOG_1,
+            "rollback.return_value": None,
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
+
+        self.assertEqual(
+            service.update_log(str(FAKE_LOG_1.id), FAKE_LOG_UPDATE_SET_1), FAKE_LOG_1
+        )
+        mock_db.update_log.assert_called_once()
+        mock_db.find_by_log_id.assert_called_once()
+        mock_db.rollback.assert_not_called()
+
+    def testUpdateLogThrowsExceptionAndRollback(self):
+        attr_db = {
+            "update_log.side_effect": Exception(),
+            "find_by_log_id.return_value": FAKE_LOG_1,
+            "rollback.return_value": None,
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
+
+        with self.assertRaises(Exception):
+            service.update_log(str(FAKE_LOG_1.id), FAKE_LOG_UPDATE_SET_1)
+
+        mock_db.update_log.assert_called_once()
+        mock_db.find_by_log_id.assert_not_called()
+        mock_db.rollback.assert_called_once()
         
