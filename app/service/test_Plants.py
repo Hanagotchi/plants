@@ -1,5 +1,5 @@
 from app.exceptions.internal_service_access import InternalServiceAccessError
-from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogSchema
+from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogPhotoCreateSchema, LogPhotoSchema, LogSchema
 from dotenv import load_dotenv
 load_dotenv()
 import unittest
@@ -84,6 +84,16 @@ FAKE_LOG_CREATE_SET_2: LogCreateSchema = LogCreateSchema(
     content=FAKE_LOG_2.content,
     photos=FAKE_LOG_2.photos,
     plant_id=FAKE_LOG_2.plant_id,
+)
+
+FAKE_LOG_PHOTO_CREATE_SET_1: LogPhotoCreateSchema = LogPhotoCreateSchema(
+    photo_link="fake_photo_link_1"
+)
+
+FAKE_LOG_PHOTO_1: LogPhotoSchema = LogPhotoSchema(
+    id=1,
+    log_id=FAKE_LOG_1.id,
+    photo_link=FAKE_LOG_PHOTO_CREATE_SET_1.photo_link
 )
 
 class TestCourses(unittest.IsolatedAsyncioTestCase):
@@ -414,3 +424,61 @@ class TestCourses(unittest.IsolatedAsyncioTestCase):
         mock_db.find_by_log_id.assert_not_called()
         mock_db.rollback.assert_called_once()
         
+    def testAddLogPhotoWorksCorrectly(self):
+        attr_db = {
+            "add.return_value": None,
+            "find_by_log_id.return_value": FAKE_LOG_1,
+            "rollback.return_value": None,
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
+
+        self.assertEqual(
+            service.add_photo(str(FAKE_LOG_1.id), FAKE_LOG_PHOTO_CREATE_SET_1), FAKE_LOG_1
+        )
+        mock_db.add.assert_called_once()
+        mock_db.find_by_log_id.assert_called_once_with(str(FAKE_LOG_1.id))
+        mock_db.rollback.assert_not_called()
+
+    def testAddLogPhotoThrowsExceptionAndRollback(self):
+        attr_db = {
+            "add.side_effect": Exception(),
+            "find_by_log_id.return_value": FAKE_LOG_1,
+            "rollback.return_value": None,
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
+
+        with self.assertRaises(Exception):
+            service.add_photo(str(FAKE_LOG_1.id), FAKE_LOG_PHOTO_CREATE_SET_1)
+
+        mock_db.add.assert_called_once()
+        mock_db.find_by_log_id.assert_not_called()
+        mock_db.rollback.assert_called_once()
+
+    def testDeleteLogPhotoWorksCorrectly(self):
+        attr_db = {
+            "delete_photo_from_log.return_value": 1,
+            "rollback.return_value": None,
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
+
+        service.delete_photo(FAKE_LOG_1.id, FAKE_LOG_PHOTO_1.id)
+        
+        mock_db.delete_photo_from_log.assert_called_once_with(FAKE_LOG_1.id, FAKE_LOG_PHOTO_1.id)
+        mock_db.rollback.assert_not_called()
+
+    def testDeleteLogPhotoThrowsNotRowFoundErrorAndRollback(self):
+        attr_db = {
+            "delete_photo_from_log.return_value": 0,
+            "rollback.return_value": None,
+        }
+        mock_db = self._getMock(PlantsRepository, attr_db)
+        service = PlantsService(mock_db, Mock(), Mock())
+
+        with self.assertRaises(RowNotFoundError):
+            service.delete_photo(FAKE_LOG_1.id, FAKE_LOG_PHOTO_1.id)
+        
+        mock_db.delete_photo_from_log.assert_called_once_with(FAKE_LOG_1.id, FAKE_LOG_PHOTO_1.id)
+        mock_db.rollback.assert_called_once()
