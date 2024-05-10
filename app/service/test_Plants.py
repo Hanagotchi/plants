@@ -1,7 +1,13 @@
-from app.exceptions.internal_service_access import InternalServiceAccessError
-from app.schemas.Log import LogCreateSchema, LogPartialUpdateSchema, LogPhotoCreateSchema, LogPhotoSchema, LogSchema
 from dotenv import load_dotenv
 load_dotenv()
+from app.exceptions.internal_service_access import InternalServiceAccessError
+from app.schemas.Log import (
+    LogCreateSchema, 
+    LogPartialUpdateSchema, 
+    LogPhotoCreateSchema, 
+    LogPhotoSchema, 
+    LogSchema
+)
 import unittest
 import asyncio
 from app.exceptions.row_not_found import RowNotFoundError

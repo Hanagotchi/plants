@@ -26,9 +26,9 @@ logger.setLevel("DEBUG")
 class PlantsService():
 
     def __init__(
-            self, 
-            plants_repository: PlantsRepository, 
-            measurement_service: MeasurementService, 
+            self,
+            plants_repository: PlantsRepository,
+            measurement_service: MeasurementService,
             user_service: UserService
             ):
         self.plants_repository = plants_repository
