@@ -17,8 +17,7 @@ class UserService:
             response = await client.get(USERS_SERVICE_URL + path)
             return response.raise_for_status()
 
-    @staticmethod
-    async def check_existing_user(user_id: int) -> Response:
+    async def check_existing_user(self, user_id: int) -> Response:
         try:
             response = await UserService.get(f"/users/{user_id}")
             if response.status_code == 200:

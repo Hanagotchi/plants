@@ -25,8 +25,15 @@ logger.setLevel("DEBUG")
 
 class PlantsService():
 
-    def __init__(self, plants_repository: PlantsRepository):
+    def __init__(
+            self,
+            plants_repository: PlantsRepository,
+            measurement_service: MeasurementService,
+            user_service: UserService
+            ):
         self.plants_repository = plants_repository
+        self.measurement_service = measurement_service
+        self.user_service = user_service
 
     def create_log(self, input_log: LogCreateSchema) -> LogSchema:
         try:
@@ -143,7 +150,7 @@ class PlantsService():
         ))
 
     async def create_plant(self, data: PlantCreateSchema) -> PlantSchema:
-        await UserService.check_existing_user(data.id_user)
+        await self.user_service.check_existing_user(data.id_user)
         try:
             plant = Plant.from_pydantic(data)
             self.plants_repository.add(plant)
@@ -185,7 +192,7 @@ class PlantsService():
             raise err
 
         try:
-            await MeasurementService.delete_device_plant(id_plant)
+            await self.measurement_service.delete_device_plant(id_plant)
         except HTTPException as err:
             # If there is no row, ignore. It could happen sometimes :D
             if err.status_code != status.HTTP_404_NOT_FOUND:

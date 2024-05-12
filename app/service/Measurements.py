@@ -25,8 +25,7 @@ class MeasurementService:
                 detail=e.response.content,
             )
 
-    @staticmethod
-    async def delete_device_plant(plant_id: int) -> Response:
+    async def delete_device_plant(self, plant_id: int) -> Response:
         return await MeasurementService.delete(
             f"/device-plant/{plant_id}?type_id=id_plant"
         )
