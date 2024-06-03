@@ -106,7 +106,9 @@ def get_one_plant(req: Request, id_plant: int):
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
-async def delete_plant(response: Response, id_plant: int, token: str = Depends(get_access_token)):
+async def delete_plant(response: Response,
+                       id_plant: int,
+                       token: str = Depends(get_access_token)):
     return await plants_controller.handle_delete_plant(response, id_plant, token)
 
 
