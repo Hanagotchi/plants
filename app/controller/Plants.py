@@ -20,7 +20,9 @@ class PlantController:
     def __init__(self, plants_service: PlantsService):
         self.plants_service = plants_service
 
-    async def handle_create_log(self, input_log: LogCreateSchema, token: str) -> JSONResponse:
+    async def handle_create_log(self,
+                                input_log: LogCreateSchema,
+                                token: str) -> JSONResponse:
         log: LogSchema = await self.plants_service.create_log(input_log, token)
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
@@ -108,7 +110,9 @@ class PlantController:
             content=jsonable_encoder(plant_type_list)
         )
 
-    async def handle_create_plant(self, data: PlantCreateSchema, token: str) -> JSONResponse:
+    async def handle_create_plant(self,
+                                  data: PlantCreateSchema,
+                                  token: str) -> JSONResponse:
         try:
             plant: PlantSchema = await self.plants_service.create_plant(data, token)
             return JSONResponse(
