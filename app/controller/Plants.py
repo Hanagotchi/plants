@@ -108,9 +108,9 @@ class PlantController:
             content=jsonable_encoder(plant_type_list)
         )
 
-    async def handle_create_plant(self, data: PlantCreateSchema) -> JSONResponse:
+    async def handle_create_plant(self, data: PlantCreateSchema, token: str) -> JSONResponse:
         try:
-            plant: PlantSchema = await self.plants_service.create_plant(data)
+            plant: PlantSchema = await self.plants_service.create_plant(data, token)
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
                 content=jsonable_encoder(plant)
@@ -167,10 +167,11 @@ class PlantController:
     async def handle_delete_plant(
             self,
             response: Response,
-            id_plant: int
+            id_plant: int,
+            token: str
             ) -> JSONResponse:
         try:
-            await self.plants_service.delete_plant(id_plant)
+            await self.plants_service.delete_plant(id_plant, token)
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
                 content="Plant deleted successfully",

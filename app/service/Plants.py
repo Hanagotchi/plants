@@ -2,6 +2,7 @@ from datetime import date
 import logging
 from fastapi import status, HTTPException
 from typing import List, Optional, Sequence
+from app.exceptions.PlantsException import UserUnauthorized
 from app.exceptions.internal_service_access import InternalServiceAccessError
 from app.exceptions.row_not_found import RowNotFoundError
 
@@ -149,8 +150,11 @@ class PlantsService():
             plant_types
         ))
 
-    async def create_plant(self, data: PlantCreateSchema) -> PlantSchema:
-        await self.user_service.check_existing_user(data.id_user)
+    async def create_plant(self, data: PlantCreateSchema, token: str) -> PlantSchema:
+        user_id = await UserService.get_user_id(token)
+        if user_id != data.id_user:
+            raise UserUnauthorized
+
         try:
             plant = Plant.from_pydantic(data)
             self.plants_repository.add(plant)
@@ -180,13 +184,13 @@ class PlantsService():
             self.plants_repository.get_all_plants_by_user(id_user, limit)
         ))
 
-    async def delete_plant(self, id_plant: int):
+    async def delete_plant(self, id_plant: int, token: str):
+        user_id = await UserService.get_user_id(token)
+        plant = self.plants_repository.get_plant_by_id(id_plant)
+        if plant.id_user != user_id:
+            raise UserUnauthorized
         try:
-            row_count = self.plants_repository.delete_plant(id_plant)
-            if row_count == 0:
-                raise RowNotFoundError(
-                    f"Could not found plant with id {id_plant}"
-                )
+            self.plants_repository.delete_plant(id_plant)
         except Exception as err:
             self.plants_repository.rollback()
             raise err

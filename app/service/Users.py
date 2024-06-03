@@ -1,4 +1,5 @@
 import logging
+from fastapi import HTTPException
 from httpx import AsyncClient, HTTPStatusError, Response
 from os import environ
 from app.exceptions.internal_service_access import InternalServiceAccessError
@@ -17,9 +18,27 @@ class UserService:
             response = await client.get(USERS_SERVICE_URL + path)
             return response.raise_for_status()
 
+    @staticmethod
+    async def get_user_id(token: str) -> int:
+        try:
+            async with AsyncClient() as client:
+                response = await client.post(
+                    USERS_SERVICE_URL + "users/token", json={"token": token}
+                )
+                response.raise_for_status()
+                user_id = response.json().get("user_id")
+                return user_id
+
+        except HTTPStatusError as e:
+            logger.error("Error while getting user ID: " + str(e))
+            raise HTTPException(
+                status_code=e.response.status_code,
+                detail=e.response.content.decode(),
+            )
+
     async def check_existing_user(self, user_id: int) -> Response:
         try:
-            response = await UserService.get(f"/users/{user_id}")
+            response = await UserService.get(f"users/{user_id}")
             if response.status_code == 200:
                 return
             else:

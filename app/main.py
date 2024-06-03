@@ -1,6 +1,6 @@
 from app.service.Measurements import MeasurementService
 from app.service.Users import UserService
-from fastapi import FastAPI, Request, Response, status, Query, Body
+from fastapi import Depends, FastAPI, Header, Request, Response, status, Query, Body
 from app.controller.Plants import PlantController
 import logging
 from typing import Optional
@@ -34,6 +34,10 @@ logger = logging.getLogger("plants")
 logger.setLevel("DEBUG")
 
 
+async def get_access_token(x_access_token: str = Header(...)):
+    return x_access_token.split(" ")[1]
+
+
 @app.on_event("startup")
 async def start_up():
     app.logger = logger
@@ -60,8 +64,8 @@ async def shutdown_db_client():
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
-async def create_plant(item: PlantCreateSchema):
-    return await plants_controller.handle_create_plant(item)
+async def create_plant(item: PlantCreateSchema, token: str = Depends(get_access_token)):
+    return await plants_controller.handle_create_plant(item, token)
 
 
 @app.get("/plants", tags=["Plants"])
@@ -102,8 +106,8 @@ def get_one_plant(req: Request, id_plant: int):
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
     },
 )
-async def delete_plant(response: Response, id_plant: int):
-    return await plants_controller.handle_delete_plant(response, id_plant)
+async def delete_plant(response: Response, id_plant: int, token: str = Depends(get_access_token)):
+    return await plants_controller.handle_delete_plant(response, id_plant, token)
 
 
 @app.get(
