@@ -132,8 +132,8 @@ def get_plant_type(
     "/logs/{id_log}",
     tags=["Logs"],
 )
-def get_log(id_log: int):
-    return plants_controller.handle_get_log(id_log)
+async def get_log(id_log: int, token: str = Depends(get_access_token)):
+    return await plants_controller.handle_get_log(id_log, token)
 
 
 @app.post(

@@ -27,8 +27,8 @@ class PlantController:
             content=jsonable_encoder(log)
         )
 
-    def handle_get_log(self, log_id: int) -> JSONResponse:
-        log: LogSchema = self.plants_service.get_log(log_id)
+    async def handle_get_log(self, log_id: int, token: str) -> JSONResponse:
+        log: LogSchema = await self.plants_service.get_log(log_id, token)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=jsonable_encoder(log)

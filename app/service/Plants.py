@@ -49,11 +49,16 @@ class PlantsService():
             self.plants_repository.rollback()
             raise err
 
-    def get_log(self, log_id: int) -> LogSchema:
+    async def get_log(self, log_id: int, token: str) -> LogSchema:
         log: Log = self.plants_repository.get_log(log_id)
         # TODO: Este print hace que los logs se parsen bien a LogSchemas.
         # No quitar a menos que se encuentre una mejor solucion.
         print(log)
+        user_id = await UserService.get_user_id(token)
+        plant = self.plants_repository.get_plant_by_id(log.plant_id)
+        if user_id != plant.id_user:
+            raise UserUnauthorized
+
         return LogSchema.model_validate(log.__dict__)
 
     def get_logs_by_user(
