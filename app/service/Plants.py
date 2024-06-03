@@ -36,7 +36,11 @@ class PlantsService():
         self.measurement_service = measurement_service
         self.user_service = user_service
 
-    def create_log(self, input_log: LogCreateSchema) -> LogSchema:
+    async def create_log(self, input_log: LogCreateSchema, token) -> LogSchema:
+        user_id = await UserService.get_user_id(token)
+        plant = self.plants_repository.get_plant_by_id(input_log.plant_id)
+        if user_id != plant.id_user:
+            raise UserUnauthorized
         try:
             log = Log.from_pydantic(input_log)
             self.plants_repository.add(log)

@@ -140,8 +140,8 @@ async def get_log(id_log: int, token: str = Depends(get_access_token)):
     "/logs",
     tags=["Logs"],
 )
-def create_log(item: LogCreateSchema):
-    return plants_controller.handle_create_log(item)
+async def create_log(item: LogCreateSchema, token: str = Depends(get_access_token)):
+    return await plants_controller.handle_create_log(item, token)
 
 
 @app.patch(
