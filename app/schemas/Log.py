@@ -9,7 +9,7 @@ class LogPhotoCreateSchema(BaseModel):
     photo_link: str = Field(..., max_length=300)
 
     class Config:
-        json_schema_extra = {
+        json_json_schema_extra = {
             "example": {
                 "photo_link": link,
             }
@@ -22,7 +22,7 @@ class LogPhotoSchema(LogPhotoCreateSchema):
 
     class Config:
         from_attributes = True
-        json_schema_extra = {
+        json_json_schema_extra = {
             "example": {
                 "photo_link": link,
                 "id": 1
@@ -37,7 +37,7 @@ class LogCreateSchema(BaseModel):
     plant_id: int = Field(...)
 
     class Config:
-        json_schema_extra = {
+        json_json_schema_extra = {
             "example": {
                 "title": "Mi buena petuña",
                 "content": ("Mi buena petuña es hermosa. "
@@ -65,7 +65,7 @@ class LogSchema(LogCreateSchema):
 
     class Config:
         from_attributes = True
-        json_schema_extra = {
+        json_json_schema_extra = {
             "example": {
                 "id": 102,
                 "title": "Mi buena petuña",
@@ -92,7 +92,7 @@ class LogPartialUpdateSchema(BaseModel):
     plant_id: Optional[int] = Field(None)
 
     class Config:
-        json_schema_extra = {
+        json_json_schema_extra = {
             "example": {
                 "title": "Mi buena petuña",
                 "content": ("Mi buena petuña es hermosa. "

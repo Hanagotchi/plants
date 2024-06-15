@@ -13,7 +13,7 @@ class PlantTypeSchema(BaseModel):
     photo_link: str = Field(..., max_length=300)
 
     class Config:
-        json_schema_extra = {
+        json_json_schema_extra = {
             "example": {
                 "botanical_name": "Streptocarpus",
                 "id": 224,
