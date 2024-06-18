@@ -36,11 +36,13 @@ class PlantController:
             content=jsonable_encoder(log)
         )
 
-    async def handle_get_logs_by_user(self,
-                                user_id: int,
-                                year: int,
-                                month: Optional[int],
-                                token: str) -> JSONResponse:
+    async def handle_get_logs_by_user(
+        self,
+        user_id: int,
+        year: int,
+        month: Optional[int],
+        token: str
+    ) -> JSONResponse:
         log_list: List[LogSchema] = await self.plants_service.get_logs_by_user(
             user_id, year, month, token
         )
@@ -70,11 +72,12 @@ class PlantController:
             detail=f"Could not found a log with id {log_id}"
         )
 
-    async def handle_add_photo(self,
-                         id_log: str,
-                         photo_create_set: LogPhotoCreateSchema,
-                         token: str
-                         ) -> JSONResponse:
+    async def handle_add_photo(
+        self,
+        id_log: str,
+        photo_create_set: LogPhotoCreateSchema,
+        token: str
+    ) -> JSONResponse:
         log: LogSchema = await self.plants_service.add_photo(
             id_log, photo_create_set, token
         )
@@ -83,11 +86,13 @@ class PlantController:
             content=jsonable_encoder(log)
         )
 
-    async def handle_delete_photo(self,
-                            response: Response,
-                            id_log: int,
-                            id_photo: int,
-                            token: str) -> JSONResponse:
+    async def handle_delete_photo(
+        self,
+        response: Response,
+        id_log: int,
+        id_photo: int,
+        token: str
+    ) -> JSONResponse:
         try:
             await self.plants_service.delete_photo(id_log, id_photo, token)
             return JSONResponse(
@@ -178,7 +183,7 @@ class PlantController:
             response: Response,
             id_plant: int,
             token: str
-            ) -> JSONResponse:
+    ) -> JSONResponse:
         try:
             await self.plants_service.delete_plant(id_plant, token)
             return JSONResponse(

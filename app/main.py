@@ -41,7 +41,6 @@ async def get_access_token(x_access_token: str = Header(...)):
 @app.on_event("startup")
 async def start_up():
     app.logger = logger
-
     try:
         app.logger.info("Postgres connection established")
     except Exception as e:
@@ -69,7 +68,11 @@ async def create_plant(item: PlantCreateSchema, token: str = Depends(get_access_
 
 
 @app.get("/plants", tags=["Plants"])
-async def get_all_plants(id_user: int = Query(None), limit: int = Query(1024), token: str = Depends(get_access_token)):
+async def get_all_plants(
+    id_user: int = Query(None),
+    limit: int = Query(1024),
+    token: str = Depends(get_access_token)
+):
     if id_user is not None:
         return await plants_controller.handle_get_plants_by_user(id_user, limit, token)
 
@@ -152,7 +155,9 @@ async def create_log(item: LogCreateSchema,
     tags=["Logs"],
 )
 async def update_fields_in_log(
-    id_log: str, log_update_set: LogPartialUpdateSchema = Body(...), token: str = Depends(get_access_token)
+    id_log: str,
+    log_update_set: LogPartialUpdateSchema = Body(...),
+    token: str = Depends(get_access_token)
 ):
     return await plants_controller.handle_update_log(id_log, log_update_set, token)
 
@@ -174,7 +179,11 @@ async def get_logs_by_user(
     "/logs/{id_log}/photos",
     tags=["Logs"],
 )
-async def add_photo(id_log: str, photo_create_set: LogPhotoCreateSchema = Body(...), token: str = Depends(get_access_token)):
+async def add_photo(
+    id_log: str,
+    photo_create_set: LogPhotoCreateSchema = Body(...),
+    token: str = Depends(get_access_token)
+):
     return await plants_controller.handle_add_photo(id_log, photo_create_set, token)
 
 
@@ -182,5 +191,9 @@ async def add_photo(id_log: str, photo_create_set: LogPhotoCreateSchema = Body(.
     "/logs/{id_log}/photos/{id_photo}",
     tags=["Logs"],
 )
-async def delete_photo(response: Response, id_log: int, id_photo: int, token: str = Depends(get_access_token)):
+async def delete_photo(
+    response: Response,
+    id_log: int, id_photo: int,
+    token: str = Depends(get_access_token)
+):
     return await plants_controller.handle_delete_photo(response, id_log, id_photo, token)

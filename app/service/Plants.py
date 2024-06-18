@@ -108,11 +108,12 @@ class PlantsService():
             if user_id != plant.id_user:
                 raise UserUnauthorized
 
-            if log_update_set.plant_id != None:
-                new_plant = self.plants_repository.get_plant_by_id(log_update_set.plant_id)
+            if log_update_set.plant_id is not None:
+                new_plant = self.plants_repository.\
+                    get_plant_by_id(log_update_set.plant_id)
                 if user_id != new_plant.id_user:
                     raise UserUnauthorized
-            
+
             self.plants_repository.update_log(
                 log_id,
                 log_update_set.title,
