@@ -35,7 +35,7 @@ logger.setLevel("DEBUG")
 
 
 async def get_access_token(x_access_token: str = Header(...)):
-    return x_access_token.split(" ")[1]
+    return x_access_token
 
 
 @app.on_event("startup")
@@ -69,9 +69,9 @@ async def create_plant(item: PlantCreateSchema, token: str = Depends(get_access_
 
 
 @app.get("/plants", tags=["Plants"])
-def get_all_plants(id_user: int = Query(None), limit: int = Query(1024)):
+async def get_all_plants(id_user: int = Query(None), limit: int = Query(1024), token: str = Depends(get_access_token)):
     if id_user is not None:
-        return plants_controller.handle_get_plants_by_user(id_user, limit)
+        return await plants_controller.handle_get_plants_by_user(id_user, limit, token)
 
     return plants_controller.handle_get_all_plants(limit)
 
@@ -151,35 +151,36 @@ async def create_log(item: LogCreateSchema,
     "/logs/{id_log}",
     tags=["Logs"],
 )
-def update_fields_in_log(
-    id_log: str, log_update_set: LogPartialUpdateSchema = Body(...)
+async def update_fields_in_log(
+    id_log: str, log_update_set: LogPartialUpdateSchema = Body(...), token: str = Depends(get_access_token)
 ):
-    return plants_controller.handle_update_log(id_log, log_update_set)
+    return await plants_controller.handle_update_log(id_log, log_update_set, token)
 
 
 @app.get(
     "/logs/user/{user_id}",
     tags=["Logs"],
 )
-def get_logs_by_user(
+async def get_logs_by_user(
     user_id: int,
     year: int = Query(..., gt=0),
     month: Optional[int] = Query(None, ge=1, le=12),
+    token: str = Depends(get_access_token)
 ):
-    return plants_controller.handle_get_logs_by_user(user_id, year, month)
+    return await plants_controller.handle_get_logs_by_user(user_id, year, month, token)
 
 
 @app.post(
     "/logs/{id_log}/photos",
     tags=["Logs"],
 )
-def add_photo(id_log: str, photo_create_set: LogPhotoCreateSchema = Body(...)):
-    return plants_controller.handle_add_photo(id_log, photo_create_set)
+async def add_photo(id_log: str, photo_create_set: LogPhotoCreateSchema = Body(...), token: str = Depends(get_access_token)):
+    return await plants_controller.handle_add_photo(id_log, photo_create_set, token)
 
 
 @app.delete(
     "/logs/{id_log}/photos/{id_photo}",
     tags=["Logs"],
 )
-def delete_photo(response: Response, id_log: int, id_photo: int):
-    return plants_controller.handle_delete_photo(response, id_log, id_photo)
+async def delete_photo(response: Response, id_log: int, id_photo: int, token: str = Depends(get_access_token)):
+    return await plants_controller.handle_delete_photo(response, id_log, id_photo, token)

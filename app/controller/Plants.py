@@ -36,25 +36,27 @@ class PlantController:
             content=jsonable_encoder(log)
         )
 
-    def handle_get_logs_by_user(self,
+    async def handle_get_logs_by_user(self,
                                 user_id: int,
                                 year: int,
-                                month: Optional[int]) -> JSONResponse:
-        log_list: List[LogSchema] = self.plants_service.get_logs_by_user(
-            user_id, year, month
+                                month: Optional[int],
+                                token: str) -> JSONResponse:
+        log_list: List[LogSchema] = await self.plants_service.get_logs_by_user(
+            user_id, year, month, token
         )
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=jsonable_encoder(log_list)
         )
 
-    def handle_update_log(
+    async def handle_update_log(
         self,
         log_id: str,
-        log_update_set: LogPartialUpdateSchema
+        log_update_set: LogPartialUpdateSchema,
+        token: str
     ) -> JSONResponse:
-        log: Optional[LogSchema] = self.plants_service.update_log(
-            log_id, log_update_set
+        log: Optional[LogSchema] = await self.plants_service.update_log(
+            log_id, log_update_set, token
         )
 
         if log:
@@ -68,24 +70,26 @@ class PlantController:
             detail=f"Could not found a log with id {log_id}"
         )
 
-    def handle_add_photo(self,
+    async def handle_add_photo(self,
                          id_log: str,
-                         photo_create_set: LogPhotoCreateSchema
+                         photo_create_set: LogPhotoCreateSchema,
+                         token: str
                          ) -> JSONResponse:
-        log: LogSchema = self.plants_service.add_photo(
-            id_log, photo_create_set
+        log: LogSchema = await self.plants_service.add_photo(
+            id_log, photo_create_set, token
         )
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content=jsonable_encoder(log)
         )
 
-    def handle_delete_photo(self,
+    async def handle_delete_photo(self,
                             response: Response,
                             id_log: int,
-                            id_photo: int) -> JSONResponse:
+                            id_photo: int,
+                            token: str) -> JSONResponse:
         try:
-            self.plants_service.delete_photo(id_log, id_photo)
+            await self.plants_service.delete_photo(id_log, id_photo, token)
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
                 content="Photo deleted successfully"
@@ -146,13 +150,14 @@ class PlantController:
             content=jsonable_encoder(plant_list)
         )
 
-    def handle_get_plants_by_user(
+    async def handle_get_plants_by_user(
             self,
             id_user: int,
-            limit: int
+            limit: int,
+            token: str
             ) -> JSONResponse:
-        user_plant_list: List[PlantSchema] = self.plants_service\
-                .get_plants_by_user(id_user, limit)
+        user_plant_list: List[PlantSchema] = await self.plants_service\
+                .get_plants_by_user(id_user, limit, token)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=jsonable_encoder(user_plant_list)
