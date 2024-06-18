@@ -196,4 +196,5 @@ async def delete_photo(
     id_log: int, id_photo: int,
     token: str = Depends(get_access_token)
 ):
-    return await plants_controller.handle_delete_photo(response, id_log, id_photo, token)
+    return await plants_controller.handle_delete_photo(
+        response, id_log, id_photo, token)
