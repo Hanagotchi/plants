@@ -1,5 +1,10 @@
 import logging
-from httpx import AsyncClient, HTTPStatusError, Response
+from httpx import (
+    AsyncHTTPTransport,
+    AsyncClient,
+    HTTPStatusError,
+    Response
+)
 from os import environ
 from fastapi import HTTPException
 
@@ -7,13 +12,18 @@ logger = logging.getLogger("app")
 logger.setLevel("DEBUG")
 
 MEASUREMENTS_SERVICE_URL = environ["MEASUREMENTS_SERVICE_URL"]
+NUMBER_OF_RETRIES = 3
+TIMEOUT = 10
 
 
 class MeasurementService:
     @staticmethod
     async def delete(path: str) -> Response:
         try:
-            async with AsyncClient() as client:
+            async with AsyncClient(
+                transport=AsyncHTTPTransport(retries=NUMBER_OF_RETRIES),
+                timeout=TIMEOUT
+            ) as client:
                 response = await client.delete(MEASUREMENTS_SERVICE_URL + path)
                 return response.raise_for_status()
         except HTTPStatusError as e:
