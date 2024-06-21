@@ -23,7 +23,7 @@ class UserService:
         try:
             async with AsyncClient() as client:
                 response = await client.post(
-                    USERS_SERVICE_URL + "users/token", json={"token": token}
+                    USERS_SERVICE_URL + "/users/token", json={"token": token}
                 )
                 response.raise_for_status()
                 user_id = response.json().get("user_id")
@@ -38,7 +38,7 @@ class UserService:
 
     async def check_existing_user(self, user_id: int) -> Response:
         try:
-            response = await UserService.get(f"users/{user_id}")
+            response = await UserService.get(f"/users/{user_id}")
             if response.status_code == 200:
                 return
             else:
