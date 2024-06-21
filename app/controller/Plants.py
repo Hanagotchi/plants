@@ -20,39 +20,45 @@ class PlantController:
     def __init__(self, plants_service: PlantsService):
         self.plants_service = plants_service
 
-    def handle_create_log(self, input_log: LogCreateSchema) -> JSONResponse:
-        log: LogSchema = self.plants_service.create_log(input_log)
+    async def handle_create_log(self,
+                                input_log: LogCreateSchema,
+                                token: str) -> JSONResponse:
+        log: LogSchema = await self.plants_service.create_log(input_log, token)
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content=jsonable_encoder(log)
         )
 
-    def handle_get_log(self, log_id: int) -> JSONResponse:
-        log: LogSchema = self.plants_service.get_log(log_id)
+    async def handle_get_log(self, log_id: int, token: str) -> JSONResponse:
+        log: LogSchema = await self.plants_service.get_log(log_id, token)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=jsonable_encoder(log)
         )
 
-    def handle_get_logs_by_user(self,
-                                user_id: int,
-                                year: int,
-                                month: Optional[int]) -> JSONResponse:
-        log_list: List[LogSchema] = self.plants_service.get_logs_by_user(
-            user_id, year, month
+    async def handle_get_logs_by_user(
+        self,
+        user_id: int,
+        year: int,
+        month: Optional[int],
+        token: str
+    ) -> JSONResponse:
+        log_list: List[LogSchema] = await self.plants_service.get_logs_by_user(
+            user_id, year, month, token
         )
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=jsonable_encoder(log_list)
         )
 
-    def handle_update_log(
+    async def handle_update_log(
         self,
         log_id: str,
-        log_update_set: LogPartialUpdateSchema
+        log_update_set: LogPartialUpdateSchema,
+        token: str
     ) -> JSONResponse:
-        log: Optional[LogSchema] = self.plants_service.update_log(
-            log_id, log_update_set
+        log: Optional[LogSchema] = await self.plants_service.update_log(
+            log_id, log_update_set, token
         )
 
         if log:
@@ -66,24 +72,29 @@ class PlantController:
             detail=f"Could not found a log with id {log_id}"
         )
 
-    def handle_add_photo(self,
-                         id_log: str,
-                         photo_create_set: LogPhotoCreateSchema
-                         ) -> JSONResponse:
-        log: LogSchema = self.plants_service.add_photo(
-            id_log, photo_create_set
+    async def handle_add_photo(
+        self,
+        id_log: str,
+        photo_create_set: LogPhotoCreateSchema,
+        token: str
+    ) -> JSONResponse:
+        log: LogSchema = await self.plants_service.add_photo(
+            id_log, photo_create_set, token
         )
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content=jsonable_encoder(log)
         )
 
-    def handle_delete_photo(self,
-                            response: Response,
-                            id_log: int,
-                            id_photo: int) -> JSONResponse:
+    async def handle_delete_photo(
+        self,
+        response: Response,
+        id_log: int,
+        id_photo: int,
+        token: str
+    ) -> JSONResponse:
         try:
-            self.plants_service.delete_photo(id_log, id_photo)
+            await self.plants_service.delete_photo(id_log, id_photo, token)
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
                 content="Photo deleted successfully"
@@ -108,9 +119,11 @@ class PlantController:
             content=jsonable_encoder(plant_type_list)
         )
 
-    async def handle_create_plant(self, data: PlantCreateSchema) -> JSONResponse:
+    async def handle_create_plant(self,
+                                  data: PlantCreateSchema,
+                                  token: str) -> JSONResponse:
         try:
-            plant: PlantSchema = await self.plants_service.create_plant(data)
+            plant: PlantSchema = await self.plants_service.create_plant(data, token)
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
                 content=jsonable_encoder(plant)
@@ -133,22 +146,13 @@ class PlantController:
             content=jsonable_encoder(plant)
         )
 
-    def handle_get_all_plants(self, limit: int) -> JSONResponse:
-        plant_list: List[PlantSchema] = self.plants_service.get_all_plants(
-            limit
-        )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=jsonable_encoder(plant_list)
-        )
-
-    def handle_get_plants_by_user(
+    async def handle_get_plants_by_user(
             self,
-            id_user: int,
-            limit: int
+            limit: int,
+            token: str
             ) -> JSONResponse:
-        user_plant_list: List[PlantSchema] = self.plants_service\
-                .get_plants_by_user(id_user, limit)
+        user_plant_list: List[PlantSchema] = await self.plants_service\
+                .get_plants_by_user(limit, token)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=jsonable_encoder(user_plant_list)
@@ -167,10 +171,11 @@ class PlantController:
     async def handle_delete_plant(
             self,
             response: Response,
-            id_plant: int
-            ) -> JSONResponse:
+            id_plant: int,
+            token: str
+    ) -> JSONResponse:
         try:
-            await self.plants_service.delete_plant(id_plant)
+            await self.plants_service.delete_plant(id_plant, token)
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
                 content="Plant deleted successfully",

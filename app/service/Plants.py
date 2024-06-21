@@ -2,6 +2,7 @@ from datetime import date
 import logging
 from fastapi import status, HTTPException
 from typing import List, Optional, Sequence
+from app.exceptions.PlantsException import UserUnauthorized
 from app.exceptions.internal_service_access import InternalServiceAccessError
 from app.exceptions.row_not_found import RowNotFoundError
 
@@ -35,7 +36,11 @@ class PlantsService():
         self.measurement_service = measurement_service
         self.user_service = user_service
 
-    def create_log(self, input_log: LogCreateSchema) -> LogSchema:
+    async def create_log(self, input_log: LogCreateSchema, token) -> LogSchema:
+        user_id = await UserService.get_user_id(token)
+        plant = self.plants_repository.get_plant_by_id(input_log.plant_id)
+        if user_id != plant.id_user:
+            raise UserUnauthorized
         try:
             log = Log.from_pydantic(input_log)
             self.plants_repository.add(log)
@@ -48,19 +53,29 @@ class PlantsService():
             self.plants_repository.rollback()
             raise err
 
-    def get_log(self, log_id: int) -> LogSchema:
+    async def get_log(self, log_id: int, token: str) -> LogSchema:
+        user_id = await UserService.get_user_id(token)
         log: Log = self.plants_repository.get_log(log_id)
+        plant = self.plants_repository.get_plant_by_id(log.plant_id)
+        if user_id != plant.id_user:
+            raise UserUnauthorized
+
         # TODO: Este print hace que los logs se parsen bien a LogSchemas.
         # No quitar a menos que se encuentre una mejor solucion.
         print(log)
         return LogSchema.model_validate(log.__dict__)
 
-    def get_logs_by_user(
+    async def get_logs_by_user(
         self,
         user_id: int,
         year: int,
-        month: Optional[int]
+        month: Optional[int],
+        token: str
     ) -> List[LogSchema]:
+        id_user = await UserService.get_user_id(token)
+        if id_user != user_id:
+            raise UserUnauthorized
+
         if month:
             left = date(year, month, 1)
             right = date(year+1, 1, 1) if month == 12 else date(year, month+1, 1)
@@ -79,12 +94,26 @@ class PlantsService():
             logs
         ))
 
-    def update_log(
+    async def update_log(
         self,
         log_id: str,
-        log_update_set: LogPartialUpdateSchema
+        log_update_set: LogPartialUpdateSchema,
+        token: str
     ) -> Optional[LogSchema]:
         try:
+            user_id = await UserService.get_user_id(token)
+            log: Log = self.plants_repository.get_log(log_id)
+            plant = self.plants_repository.get_plant_by_id(log.plant_id)
+
+            if user_id != plant.id_user:
+                raise UserUnauthorized
+
+            if log_update_set.plant_id is not None:
+                new_plant = self.plants_repository.\
+                    get_plant_by_id(log_update_set.plant_id)
+                if user_id != new_plant.id_user:
+                    raise UserUnauthorized
+
             self.plants_repository.update_log(
                 log_id,
                 log_update_set.title,
@@ -101,12 +130,19 @@ class PlantsService():
             self.plants_repository.rollback()
             raise err
 
-    def add_photo(
+    async def add_photo(
         self,
         id_log: str,
-        photo_create_set: LogPhotoCreateSchema
+        photo_create_set: LogPhotoCreateSchema,
+        token: str
     ) -> LogSchema:
         try:
+            user_id = await UserService.get_user_id(token)
+            log: Log = self.plants_repository.get_log(id_log)
+            plant = self.plants_repository.get_plant_by_id(log.plant_id)
+            if user_id != plant.id_user:
+                raise UserUnauthorized
+
             self.plants_repository.add(
                 LogPhoto(photo_link=photo_create_set.photo_link, log_id=id_log)
             )
@@ -119,8 +155,14 @@ class PlantsService():
             self.plants_repository.rollback()
             raise err
 
-    def delete_photo(self, id_log: int, id_photo: int):
+    async def delete_photo(self, id_log: int, id_photo: int, token: str):
         try:
+            user_id = await UserService.get_user_id(token)
+            log: Log = self.plants_repository.get_log(id_log)
+            plant = self.plants_repository.get_plant_by_id(log.plant_id)
+            if user_id != plant.id_user:
+                raise UserUnauthorized
+
             result_rowcount = self.plants_repository.delete_photo_from_log(
                 id_log, id_photo
             )
@@ -149,8 +191,11 @@ class PlantsService():
             plant_types
         ))
 
-    async def create_plant(self, data: PlantCreateSchema) -> PlantSchema:
-        await self.user_service.check_existing_user(data.id_user)
+    async def create_plant(self, data: PlantCreateSchema, token: str) -> PlantSchema:
+        user_id = await UserService.get_user_id(token)
+        if user_id != data.id_user:
+            raise UserUnauthorized
+
         try:
             plant = Plant.from_pydantic(data)
             self.plants_repository.add(plant)
@@ -172,21 +217,22 @@ class PlantsService():
             self.plants_repository.get_all_plants(limit)
         ))
 
-    def get_plants_by_user(
-        self, id_user: int, limit: int
+    async def get_plants_by_user(
+        self, limit: int, token: str
     ) -> List[PlantSchema]:
+        user_id = await UserService.get_user_id(token)
         return list(map(
             lambda pl: PlantSchema.model_validate(pl.__dict__),
-            self.plants_repository.get_all_plants_by_user(id_user, limit)
+            self.plants_repository.get_all_plants_by_user(user_id, limit)
         ))
 
-    async def delete_plant(self, id_plant: int):
+    async def delete_plant(self, id_plant: int, token: str):
+        user_id = await UserService.get_user_id(token)
+        plant = self.plants_repository.get_plant_by_id(id_plant)
+        if plant.id_user != user_id:
+            raise UserUnauthorized
         try:
-            row_count = self.plants_repository.delete_plant(id_plant)
-            if row_count == 0:
-                raise RowNotFoundError(
-                    f"Could not found plant with id {id_plant}"
-                )
+            self.plants_repository.delete_plant(id_plant)
         except Exception as err:
             self.plants_repository.rollback()
             raise err
