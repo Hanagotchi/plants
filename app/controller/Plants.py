@@ -146,23 +146,13 @@ class PlantController:
             content=jsonable_encoder(plant)
         )
 
-    def handle_get_all_plants(self, limit: int) -> JSONResponse:
-        plant_list: List[PlantSchema] = self.plants_service.get_all_plants(
-            limit
-        )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=jsonable_encoder(plant_list)
-        )
-
     async def handle_get_plants_by_user(
             self,
-            id_user: int,
             limit: int,
             token: str
             ) -> JSONResponse:
         user_plant_list: List[PlantSchema] = await self.plants_service\
-                .get_plants_by_user(id_user, limit, token)
+                .get_plants_by_user(limit, token)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=jsonable_encoder(user_plant_list)

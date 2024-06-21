@@ -69,14 +69,10 @@ async def create_plant(item: PlantCreateSchema, token: str = Depends(get_access_
 
 @app.get("/plants", tags=["Plants"])
 async def get_all_plants(
-    id_user: int = Query(None),
     limit: int = Query(1024),
     token: str = Depends(get_access_token)
 ):
-    if id_user is not None:
-        return await plants_controller.handle_get_plants_by_user(id_user, limit, token)
-
-    return plants_controller.handle_get_all_plants(limit)
+    return await plants_controller.handle_get_plants_by_user(limit, token)
 
 
 @app.get(

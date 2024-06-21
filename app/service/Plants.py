@@ -218,14 +218,12 @@ class PlantsService():
         ))
 
     async def get_plants_by_user(
-        self, id_user: int, limit: int, token: str
+        self, limit: int, token: str
     ) -> List[PlantSchema]:
         user_id = await UserService.get_user_id(token)
-        if user_id != id_user:
-            raise UserUnauthorized
         return list(map(
             lambda pl: PlantSchema.model_validate(pl.__dict__),
-            self.plants_repository.get_all_plants_by_user(id_user, limit)
+            self.plants_repository.get_all_plants_by_user(user_id, limit)
         ))
 
     async def delete_plant(self, id_plant: int, token: str):
