@@ -36,7 +36,7 @@ class UserService:
                 timeout=TIMEOUT
             ) as client:
                 response = await client.post(
-                    USERS_SERVICE_URL + "users/token", json={"token": token}
+                    USERS_SERVICE_URL + "/users/token", json={"token": token}
                 )
                 response.raise_for_status()
                 user_id = response.json().get("user_id")
