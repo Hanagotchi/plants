@@ -1,6 +1,11 @@
 import logging
 from fastapi import HTTPException
-from httpx import AsyncClient, HTTPStatusError, Response
+from httpx import (
+    AsyncHTTPTransport,
+    AsyncClient,
+    HTTPStatusError,
+    Response
+)
 from os import environ
 from app.exceptions.internal_service_access import InternalServiceAccessError
 from app.exceptions.row_not_found import RowNotFoundError
@@ -9,19 +14,27 @@ logger = logging.getLogger("app")
 logger.setLevel("DEBUG")
 
 USERS_SERVICE_URL = environ["USERS_SERVICE_URL"]
+NUMBER_OF_RETRIES = 3
+TIMEOUT = 10
 
 
 class UserService:
     @staticmethod
     async def get(path: str) -> Response:
-        async with AsyncClient() as client:
+        async with AsyncClient(
+            transport=AsyncHTTPTransport(retries=NUMBER_OF_RETRIES),
+            timeout=TIMEOUT
+        ) as client:
             response = await client.get(USERS_SERVICE_URL + path)
             return response.raise_for_status()
 
     @staticmethod
     async def get_user_id(token: str) -> int:
         try:
-            async with AsyncClient() as client:
+            async with AsyncClient(
+                transport=AsyncHTTPTransport(retries=NUMBER_OF_RETRIES),
+                timeout=TIMEOUT
+            ) as client:
                 response = await client.post(
                     USERS_SERVICE_URL + "/users/token", json={"token": token}
                 )
